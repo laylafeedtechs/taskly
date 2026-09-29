@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-fixed": "#002113", "tertiary-container": "#6ffbbe", "on-surface-variant": "#c4c7c8", "surface-container-highest": "#353534", "on-tertiary-fixed-variant": "#005236", "surface-tint": "#c6c6c7", "on-tertiary-container": "#00734e", "on-error": "#690005", "on-primary-fixed": "#1a1c1c", "tertiary": "#ffffff", "on-error-container": "#ffdad6", "error": "#ffb4ab", "primary-fixed-dim": "#c6c6c7", "surface-bright": "#3a3939", "background": "#131313", "on-surface": "#e5e2e1", "on-primary": "#2f3131", "on-secondary-container": "#e6ecff", "on-primary-container": "#636565", "on-tertiary": "#003824", "secondary-fixed": "#d8e2ff", "secondary-container": "#0566d9", "surface": "#131313", "tertiary-fixed-dim": "#4edea3", "on-background": "#e5e2e1", "primary": "#ffffff", "surface-container-low": "#1c1b1b", "error-container": "#93000a", "on-secondary-fixed-variant": "#004395", "surface-container": "#201f1f", "on-secondary-fixed": "#001a42", "inverse-primary": "#5d5f5f", "outline": "#8e9192", "surface-variant": "#353534", "primary-fixed": "#e2e2e2", "secondary-fixed-dim": "#adc6ff", "tertiary-fixed": "#6ffbbe", "surface-container-lowest": "#0e0e0e", "outline-variant": "#444748", "surface-dim": "#131313", "secondary": "#adc6ff", "primary-container": "#e2e2e2", "inverse-surface": "#e5e2e1", "on-primary-fixed-variant": "#454747", "on-secondary": "#002e6a", "surface-container-high": "#2a2a2a", "inverse-on-surface": "#313030" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "margin-desktop": "2rem", "space-xs": "0.25rem", "gutter-desktop": "1.5rem", "space-md": "0.75rem", "gutter": "1rem", "margin": "1rem", "space-sm": "0.5rem", "space-lg": "1rem", "space-xl": "1.5rem" }, "fontFamily": { "headline-lg": ["Inter"], "headline-sm": ["Inter"], "label-md": ["Inter"], "mono-data": ["JetBrains Mono"], "body-sm": ["Inter"], "headline-md": ["Inter"], "headline-xl": ["Inter"], "label-sm": ["Inter"], "headline-xl-mobile": ["Inter"], "body-lg": ["Inter"], "body-md": ["Inter"], "mono-kbd": ["JetBrains Mono"] }, "fontSize": { "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "headline-sm": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "500" }], "mono-data": ["12px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }], "headline-md": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.015em", "fontWeight": "600" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }], "headline-xl-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }], "body-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "mono-kbd": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }] } } } };</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased select-none"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between"><div class="flex flex-col flex-1 overflow-y-auto px-space-md pt-space-lg gap-space-md"><div class="flex items-center justify-between px-space-sm pb-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="Taskly Brand Logo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1XsA0-7F5FX4b_HEAnWccv8JjbVG5LQeRda76dAfhlYqQVDYwBoQCUja2jZFuvQlduKmMGdOKuPvvEvpynkr4fuX_uBAyIYCrk37iY58p4r-4GjfVFnDgKZWu7cJXphh-rqkzhPFd_AUx5b77ev5arZlRLXf1u3GiMNqkp3Y45aM05a4JAi767Gyh2RiYH4I4kVBrdknKjOCCShgDRXZLVua8KhdYOeEvx5vCBYDpBOFdl5BSsyKLBa69Lt"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm text-primary truncate leading-none">Taskly</span><div class="flex items-center gap-1 mt-1 cursor-pointer group"><span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors truncate">Minha Empresa</span><span class="material-symbols-outlined text-[14px] text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span></div></div></div><button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[18px]">unfold_more</span></button></div><div class="flex flex-col gap-space-xs"><button class="w-full flex items-center justify-between bg-primary text-on-primary font-label-md text-label-md py-1.5 px-3 rounded hover:bg-primary-fixed transition-colors shadow-sm"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">add</span><span>Nova Tarefa</span></div><kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest/20 text-on-primary border border-surface-container-lowest/30">C</kbd></button><button class="w-full flex items-center justify-between bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md py-1.5 px-3 rounded border border-outline-variant/30 transition-colors"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">search</span><span class="font-body-sm text-body-sm">Buscar...</span></div><div class="flex items-center gap-0.5"><kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">Ctrl</kbd><kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">K</kbd></div></button></div><nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium"><div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Navegação</div><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="dashboard" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">grid_view</span><span>Dashboard</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="projects" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">folder_open</span><span>Projetos</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="my-tasks" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">check_circle</span><span>Minhas tarefas</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="kanban" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">view_kanban</span><span>Kanban</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="calendar" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">calendar_today</span><span>Calendário</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="reports" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">bar_chart</span><span>Relatórios</span></div></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="notifications" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">notifications</span><span>Notificações</span></div><span class="font-mono-data text-[11px] px-1.5 py-0.2 rounded-full bg-secondary-container text-on-secondary-container font-medium">3</span></a></nav><div class="flex flex-col gap-0.5 pt-space-xs"><div class="px-space-sm py-1 flex items-center justify-between"><span class="font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Workspaces</span><button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined text-[14px]">add</span></button></div><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-website" href="#"><span class="w-2 h-2 rounded-full bg-secondary"></span><span class="truncate">Website</span></a><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-marketing" href="#"><span class="w-2 h-2 rounded-full bg-secondary-fixed"></span><span class="truncate">Marketing</span></a><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-desenvolvimento" href="#"><span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span><span class="truncate">Desenvolvimento</span></a><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-financeiro" href="#"><span class="w-2 h-2 rounded-full bg-tertiary-container"></span><span class="truncate">Financeiro</span></a><button class="flex items-center gap-2 px-space-sm py-1.5 text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-colors"><span class="material-symbols-outlined text-[15px]">add</span><span>Novo workspace</span></button></div><div class="flex flex-col gap-0.5 pt-space-xs pb-space-md"><div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Administração</div><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">admin_panel_settings</span><span>Admin Panel</span></a><a class="flex items-center gap-2.5 px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin-logs" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-primary transition-colors">history_toggle_off</span><span>Logs de Auditoria</span></a></div></div><div class="p-space-sm border-t border-outline-variant/30 bg-surface-container-lowest/80"><div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-low transition-colors"><div class="flex items-center gap-2.5 min-w-0"><div class="relative flex-shrink-0"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/><span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-tertiary-fixed-dim ring-2 ring-surface-container-lowest"></span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface font-medium truncate leading-none">Lucas Rocha</span><span class="font-label-sm text-label-sm text-outline mt-0.5">Admin</span></div></div><div class="flex items-center gap-0.5"><a class="p-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" data-path="settings" href="#" title="Configurações"><span class="material-symbols-outlined text-[18px]">settings</span></a><a class="p-1 text-on-surface-variant hover:text-error hover:bg-surface-container rounded transition-colors" data-path="logout" href="#" title="Sair"><span class="material-symbols-outlined text-[18px]">logout</span></a></div></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-14 bg-surface-container-lowest/80 backdrop-blur-md border-b border-outline-variant/20 z-40 flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-2"><div class="flex items-center text-on-surface-variant font-label-md text-label-md gap-1.5"><span class="hover:text-primary cursor-pointer transition-colors">Taskly</span><span class="text-outline-variant">/</span><span class="hover:text-primary cursor-pointer transition-colors">Minha Empresa</span><span class="text-outline-variant">/</span><span class="text-on-surface font-medium">Workspace</span></div><div class="ml-4 flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant font-mono-data text-[11px]"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span><span>Sincronizado</span></div></div><div class="flex items-center gap-space-md"><nav class="hidden lg:flex items-center gap-space-md text-label-md font-label-md" data-active-classes="text-primary font-medium"><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="docs" href="#">Documentação</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="help" href="#">Ajuda</a><a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="changelog" href="#">Changelog</a></nav><div class="h-4 w-px bg-outline-variant/40 hidden lg:block"></div><div class="flex items-center gap-2"><button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[18px]">tune</span></button><button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[18px]">feedback</span></button><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/></div></div></header><main class="relative pt-14 min-h-screen bg-surface-container-lowest w-full px-gutter-desktop py-space-xl"><div class="flex flex-col w-full">
+<!-- Header & Context Area -->
+<div class="flex flex-col gap-space-lg mb-space-xl">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 font-mono-data text-body-sm text-on-surface-variant">
+<span>Taskly</span>
+<span>/</span>
+<span>Governança &amp; Segurança</span>
+<span>/</span>
+<span class="text-primary font-medium">Logs de Auditoria</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tight mt-1">Logs de Auditoria &amp; Conformidade</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          Trilha imutável de eventos criptograficamente assinados para auditoria SOC2 Type II, conformidade LGPD/GDPR e monitoramento contínuo de integridade corporativa.
+        </p>
+</div>
+<!-- Action Group -->
+<div class="flex flex-wrap items-center gap-space-sm self-start md:self-auto">
+<button class="h-8 px-3 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm" id="btn-verify-hash">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">verified_user</span>
+<span>Verificar Hash SHA-256</span>
+</button>
+<button class="h-8 px-3 rounded bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">alt_route</span>
+<span>Syslog / SIEM</span>
+</button>
+<div class="relative group">
+<button class="h-8 px-3 rounded bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1.5 hover:bg-primary-fixed transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">download</span>
+<span>Exportar Trilha</span>
+<span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+<div class="absolute right-0 mt-1 w-44 rounded bg-surface-container-high py-1 shadow-xl hidden group-hover:block z-50">
+<a class="flex items-center gap-2 px-3 py-1.5 text-on-surface hover:bg-surface-bright font-label-md text-label-md" href="#">
+<span class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest text-outline">.JSON</span>
+<span>Trilha Completa (NDJSON)</span>
+</a>
+<a class="flex items-center gap-2 px-3 py-1.5 text-on-surface hover:bg-surface-bright font-label-md text-label-md" href="#">
+<span class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest text-outline">.CSV</span>
+<span>Relatório Auditável</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- System Status & Integrity Badges Strip -->
+<div class="flex flex-wrap items-center gap-space-sm pt-space-xs">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-fixed-dim"></span>
+</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim">Stream em Tempo Real • Ativo</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low">
+<span class="material-symbols-outlined text-[14px] text-outline">lock</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Retenção WORM: 365 dias (Imutável)</span>
+</div>
+<div class="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low">
+<span class="material-symbols-outlined text-[14px] text-secondary">fingerprint</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Merkle Root: 0x9f1a...c4b2</span>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container text-outline font-mono-kbd text-mono-kbd">
+<span>SOC-2 TYPE II COMPLIANT</span>
+</div>
+</div>
+</div>
+<!-- Telemetry Metrics & Visual Sparkline Deck -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-space-md mb-space-lg">
+<!-- Stat 1 -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Eventos Registrados (24h)</span>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">stacked_line_chart</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="font-headline-lg text-headline-lg text-primary">4.892</span>
+<span class="font-mono-data text-body-sm text-tertiary-fixed-dim">+14.2%</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Média de 204 eventos/hora</span>
+</div>
+<!-- Stat 2 -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Críticos / Bloqueios</span>
+<span class="material-symbols-outlined text-[18px] text-error">gpp_maybe</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="font-headline-lg text-headline-lg text-error">3</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-error-container text-on-error-container">Alerta WAF</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">IPs externos bloqueados por rate-limit</span>
+</div>
+<!-- Stat 3 -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Exportações de Dados</span>
+<span class="material-symbols-outlined text-[18px] text-secondary">file_download_done</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="font-headline-lg text-headline-lg text-primary">12</span>
+<span class="font-mono-data text-body-sm text-on-surface-variant">Conformidade LGPD</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Todos com 2FA reconfirmado</span>
+</div>
+<!-- Stat 4 -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Status do Pipeline</span>
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">sensors</span>
+</div>
+<div class="flex items-baseline gap-2 mt-2">
+<span class="font-headline-lg text-headline-lg text-tertiary-fixed-dim">Saudável</span>
+<span class="font-mono-data text-body-sm text-outline">4ms latência</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Zero descartes na fila Kafka</span>
+</div>
+</div>
+<!-- Telemetry Activity Volume Strip -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm mb-space-lg">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">query_stats</span>
+<span class="font-label-md text-label-md text-primary font-medium">Fluxo de Eventos Forenses (Últimas 24 Horas)</span>
+</div>
+<div class="flex items-center gap-4 font-mono-data text-[11px] text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-surface-bright"></span>
+<span>Eventos Normais</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-secondary"></span>
+<span>Modificações Críticas</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-sm bg-error"></span>
+<span>Bloqueios / Anomalias</span>
+</div>
+</div>
+</div>
+<!-- Inline Minimalist SVG Histogram -->
+<div class="w-full h-16 flex items-end gap-1 pt-2">
+<!-- 24 Synthetic Data Bars -->
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[38%]" title="00:00 - 142 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[24%]" title="01:00 - 89 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[18%]" title="02:00 - 45 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[12%]" title="03:00 - 22 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[15%]" title="04:00 - 31 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[28%]" title="05:00 - 94 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[45%]" title="06:00 - 180 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[65%]" title="07:00 - 290 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[82%]" title="08:00 - 340 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[94%]" title="09:00 - 410 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[88%]" title="10:00 - 390 eventos"></div>
+<div class="flex-1 bg-error rounded-t-sm h-[98%]" title="11:00 - 425 eventos (1 Anomalia bloqueada)"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[72%]" title="12:00 - 310 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[86%]" title="13:00 - 380 eventos"></div>
+<div class="flex-1 bg-secondary rounded-t-sm h-[91%]" title="14:00 - 402 eventos (Alteração de Permissões)"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[84%]" title="15:00 - 365 eventos"></div>
+<div class="flex-1 bg-error rounded-t-sm h-[100%]" title="16:00 - 480 eventos (2 Tentativas não autorizadas)"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[78%]" title="17:00 - 340 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[62%]" title="18:00 - 275 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[50%]" title="19:00 - 210 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[42%]" title="20:00 - 185 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[35%]" title="21:00 - 140 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[29%]" title="22:00 - 110 eventos"></div>
+<div class="flex-1 bg-surface-bright rounded-t-sm h-[22%]" title="23:00 - 90 eventos"></div>
+</div>
+<div class="flex justify-between items-center text-[10px] font-mono-data text-outline mt-1.5">
+<span>24h atrás (00:00 BRT)</span>
+<span>12:00</span>
+<span>Agora (Tempo Real)</span>
+</div>
+</div>
+<!-- Advanced Forensics Filter Bar -->
+<div class="flex flex-col gap-space-sm p-4 rounded bg-surface-container-low shadow-sm mb-space-md">
+<!-- Row 1: Universal Search & Quick Time Picker -->
+<div class="flex flex-col md:flex-row items-center gap-space-sm w-full">
+<div class="relative flex-1 w-full">
+<span class="material-symbols-outlined absolute left-3 top-2 text-[18px] text-outline">search</span>
+<input class="w-full h-8.5 pl-9 pr-24 rounded bg-surface-container text-primary placeholder-on-surface-variant font-mono-data text-body-sm focus:outline-none focus:bg-surface-container-high transition-colors" id="search-input" placeholder="Buscar filtros: actor:lucas  ip:187.*  event:REVOKE_MEMBER  status:BLOCKED" type="text" value="actor:lucas ip:187.*"/>
+<div class="absolute right-2 top-1.5 flex items-center gap-1">
+<kbd class="font-mono-kbd text-mono-kbd px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline">⌘K</kbd>
+</div>
+</div>
+<div class="flex items-center gap-1 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+<button class="h-8 px-2.5 rounded bg-surface-container-high text-primary font-label-sm text-label-sm whitespace-nowrap">Últimos 15 min</button>
+<button class="h-8 px-2.5 rounded bg-surface-container text-on-surface-variant hover:text-primary font-label-sm text-label-sm whitespace-nowrap">24 Horas</button>
+<button class="h-8 px-2.5 rounded bg-surface-container text-on-surface-variant hover:text-primary font-label-sm text-label-sm whitespace-nowrap">7 Dias</button>
+<button class="h-8 px-2.5 rounded bg-surface-container text-on-surface-variant hover:text-primary font-label-sm text-label-sm flex items-center gap-1 whitespace-nowrap">
+<span class="material-symbols-outlined text-[14px]">calendar_month</span>
+<span>Personalizado</span>
+</button>
+</div>
+</div>
+<!-- Row 2: Category Chips & Severity Pills -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-2">
+<!-- Categories -->
+<div class="flex flex-wrap items-center gap-1.5">
+<span class="font-mono-kbd text-mono-kbd text-outline mr-1 uppercase">Categoria:</span>
+<button class="h-6 px-2.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm">Todos (4.892)</button>
+<button class="h-6 px-2.5 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-high font-label-sm text-label-sm">Autenticação &amp; 2FA</button>
+<button class="h-6 px-2.5 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-high font-label-sm text-label-sm">Modificação de Permissões</button>
+<button class="h-6 px-2.5 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-high font-label-sm text-label-sm">Exportação de Dados</button>
+<button class="h-6 px-2.5 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-high font-label-sm text-label-sm">Exclusão / Destrutivo</button>
+<button class="h-6 px-2.5 rounded-full bg-surface-container text-on-surface-variant hover:text-primary hover:bg-surface-container-high font-label-sm text-label-sm">API Integrations</button>
+</div>
+<!-- Severity Filter -->
+<div class="flex items-center gap-1">
+<span class="font-mono-kbd text-mono-kbd text-outline mr-1 uppercase">Severidade:</span>
+<button class="h-6 px-2 rounded bg-surface-container text-on-surface-variant hover:text-primary font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span>Info</span>
+</button>
+<button class="h-6 px-2 rounded bg-surface-container text-on-surface-variant hover:text-primary font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Aviso</span>
+</button>
+<button class="h-6 px-2 rounded bg-surface-container text-error font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span>Crítico (3)</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Forensics Audit Log Table -->
+<div class="flex flex-col w-full rounded bg-surface-container-low shadow-sm overflow-hidden mb-space-lg">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-outline font-mono-kbd text-mono-kbd uppercase tracking-wider">
+<th class="py-2.5 px-4 font-medium">Timestamp (BRT)</th>
+<th class="py-2.5 px-3 font-medium">Severidade / Evento</th>
+<th class="py-2.5 px-4 font-medium">Ator / Responsável</th>
+<th class="py-2.5 px-4 font-medium">IP Origem &amp; Local</th>
+<th class="py-2.5 px-4 font-medium">Recurso Afetado</th>
+<th class="py-2.5 px-4 font-medium text-right">Payload Criptográfico</th>
+</tr>
+</thead>
+<tbody class="divide-y-0 font-body-sm text-body-sm text-on-surface">
+<!-- Row 1: Suspicious Login Blocked -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">16:42:18.492</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-error-container text-on-error-container font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">security</span>
+<span>SUSPICIOUS_LOGIN_BLOCKED</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-error-container text-error flex items-center justify-center font-label-sm font-medium">?</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-error leading-tight">Desconhecido (Brute-force)</span>
+<span class="font-mono-data text-[10px] text-outline">alvo: admin@taskly.internal</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="text-error font-medium">185.220.101.42</span>
+<span class="text-outline text-[11px]">(Tor Exit Node / RU)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-mono-data text-[11px] text-on-surface-variant">Endpoint: /api/v2/auth/token</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-1')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: e8f1...9a0c</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 1 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-1">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-outline pb-1">
+<span>METADATA_SIGNATURE: sha256:e8f149b01538165cfda54029df49520281b95f2</span>
+<span>WAF_RULE_TRIGGERED: OWASP_TOP10_AUTH_BURST</span>
+</div>
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "event_uuid": "c0a80101-7fa8-4f11-92be-3c1e9df64001",
+  "client_ip": "185.220.101.42",
+  "headers": {
+    "user_agent": "python-requests/2.31.0",
+    "x_forwarded_for": "185.220.101.42",
+    "cf_ray": "8d7f2a1b9c-WAW"
+  },
+  "auth_attempt": {
+    "target_user": "admin@taskly.internal",
+    "failure_count_window": 12,
+    "action": "TEMPORARY_IP_BLACKLIST"
+  },
+  "immutable_ledger_proof": "MERKLE_LEAF_INDEX_9488102"
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 2: Member Role Change -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">16:15:02.108</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-secondary-container text-on-secondary-container font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">admin_panel_settings</span>
+<span>MEMBER_ROLE_CHANGE</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Corporate headshot of tech security officer Lucas Rocha, sharp neutral studio lighting, muted professional slate background, minimal dark aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj__sK9od_wBkw9Y3IkcWAW-7PpSwg4VdPviJQfgaslgjUR3bivcAqCySwkquNMDeUXv1DeuhyPKQTMPJkBnaoCNq43AbIzx2q3yarj6GkH1ybtZff1IDAg5wXqbFdfIN0Rfc9SQ2JiTgteQ8NoS6JJhmmf5aWhm18UC-FUnCD9zjiSwVq7LkCzPe1zKkR1pGj3GtyZU8-CzevrMbqYY_BDz_kjFFmZ4Bd4PTFruZQwAfwDzBK0ULv-A"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Lucas Rocha</span>
+<span class="font-mono-data text-[10px] text-outline">lucas.rocha@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>187.120.44.19</span>
+<span class="text-outline text-[11px]">(São Paulo, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-primary">Workspace: Financeiro</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">Membro: Roberto Paiva (Member → Admin)</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-2')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: 4a2b...91dd</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 2 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-2">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-outline pb-1">
+<span>METADATA_SIGNATURE: sha256:4a2bc719da5294a9f821e29801faecb1a89c91dd</span>
+<span>MFA_CONFIRMED: WebAuthn (YubiKey 5C)</span>
+</div>
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "rbac.role.elevate",
+  "actor_id": "usr_948a_lucas",
+  "target_user_id": "usr_210c_roberto",
+  "scope": "workspace_financeiro_prod",
+  "prev_role": "collaborator",
+  "new_role": "billing_and_security_admin",
+  "approval_ticket": "SEC-TICK-8492"
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 3: Data Export CSV -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">15:58:44.920</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-surface-container-highest text-secondary-fixed font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">cloud_download</span>
+<span>DATA_EXPORT_CSV</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of senior product manager Mariana Rios, professional workspace setting, cinematic soft lighting, dark neutral tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZmYWwngrizQ3K358uUnMqfiAsFonZt8JIvzJpeGcH-VBYUMU4ueyB1hdCRN419FWCzWqffFd6md-vG1iXMGitkP3NVM90Zx91RvomQSzWV_qYwqXonst8ZiJZBxUwRQJFVDNAjgo55r3q1S6_68QeMtyNTncEx9R2B1Gse3ynzgGn3QonznJf1n5IzyjVIFWY-bSQ91ovYENlEhe9hQ-OPuRepgSltSNFA3ol8w3KLaPvcZKXQm4o2A"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Mariana Rios</span>
+<span class="font-mono-data text-[10px] text-outline">mariana.rios@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>177.38.192.10</span>
+<span class="text-outline text-[11px]">(Curitiba, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-primary">Relatórios Financeiros Q3</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">420 linhas exportadas (LGPD Logged)</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-3')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: 11c9...330e</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 3 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-3">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-outline pb-1">
+<span>METADATA_SIGNATURE: sha256:11c97a80bbf2314eec20942ff8219082ac330e</span>
+<span>DLP_SCAN: PASSED (No Unmasked PII)</span>
+</div>
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "export.compliance_snapshot",
+  "dataset": "q3_financial_allocations",
+  "format": "text/csv",
+  "sha256_checksum": "a8204918e951bca4901fcd401859",
+  "compliance_officer_notified": true
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 4: Security Policy Update -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">14:20:10.005</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-surface-container-highest text-tertiary-fixed font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">policy</span>
+<span>SECURITY_POLICY_UPDATE</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of InfoSec Director Henrique Silveira in clean tech environment, monochrome clothing, sharp sharp focus, dark corporate ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3wNRVpAmlY5kLe_3KYoyH4zbv8KSDi9SGK3bT3Hh6OFw5ROSuP29N1S91zteUgcMp-TEjGQo3n3vvKHQqPSHdPCiXH6pdeY3KJ5LRVpa4VzB6usuQ0EwCqU_xet1j57WyJuUu7wfrVLdCFgwT2oQY_K9WDpzEp3dHeEEs9d0DM99WwE5ZI_njjkskwX3TzWhDz8MIKdTNPB4ntwRIAtE5u6BegwOefkvIJLUQPExrF3wpEy2ArU5vLg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Henrique Silveira</span>
+<span class="font-mono-data text-[10px] text-outline">henrique.s@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>201.86.114.50</span>
+<span class="text-outline text-[11px]">(Belo Horizonte, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-primary">Política Global 2FA</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">Exigir chave física FIDO2 para Admins</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-4')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: ff41...7712</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 4 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-4">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-outline pb-1">
+<span>METADATA_SIGNATURE: sha256:ff418a02c9820fdb412093847291a92083b7712</span>
+<span>ENFORCEMENT: IMMEDIATE_GLOBAL</span>
+</div>
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "iam.policy.enforce_mfa_hardware",
+  "target_roles": ["super_admin", "compliance_auditor"],
+  "grace_period_hours": 0,
+  "revoked_active_sessions": 4
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 5: Auth Success -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">13:04:19.821</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-surface-container-high text-outline font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-tertiary-fixed-dim">check_circle</span>
+<span>AUTH_SUCCESS</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Studio portrait of tech lead Camila Mendes, sharp focus, neutral dark lighting, high tech engineering vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1ZJS7hB60euMAxmatuPm8wwFHhhHg_-NfH092Y7CatGFLbjp3Ui1iVaks0iBkl2z0-QQZ1QMyiBARqZl7g4AU40OvzyNoS6dME87bofiS20JYBhuN1wezJnlFyBZbYDS0F_74zeLq1FYB3Oa8afhj2h0nRD3vaftGvyvfu11m9nnpW9RvmvcKDwObhjTO0Mov5GaCNCNtF9ZWI_q_HkNjzk6RgdBhYDVtZUN5Z_873mkx8GeQrYpBVQ"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Camila Mendes</span>
+<span class="font-mono-data text-[10px] text-outline">c.mendes@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>189.6.24.110</span>
+<span class="text-outline text-[11px]">(Rio de Janeiro, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-primary">Sessão SSO Okta</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">SAML 2.0 Auth Asserted</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-5')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: 83ab...01fe</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 5 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-5">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "auth.sso.session_create",
+  "idp": "okta_corporate_sso",
+  "session_ttl_sec": 28800,
+  "device_posture": "compliant_jamf"
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 6: API Key Revoked -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">11:12:00.654</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-surface-container-highest text-secondary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">key_off</span>
+<span>API_KEY_REVOKED</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Tech security officer Lucas Rocha in sharp black crewneck, minimalist tech background with subtle dark gray gradient." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfCYfLptrHImtRzItMjoTLUDd_4AYyzyRRZYUFVAUU8EggBNE12SFGUdD9-JXCoFDTpB973pF5OQhd-LQHlr5WyGXeGGuikuQWbNM3uAbifko5D7ZFF6AsVOMo7GBvs670wxRSPFS4fbXnDc91gEEa82HnpToITv4yvrrf5yKxfxLjM3pslduwlKLJFGTfH7blcBnQ24iFNZ2NDAx00P-DmOjB6SbfDflYYHTfAsMH-gHjtXvJJMlHcQ"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Lucas Rocha</span>
+<span class="font-mono-data text-[10px] text-outline">lucas.rocha@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>187.120.44.19</span>
+<span class="text-outline text-[11px]">(São Paulo, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-primary">Webhook: Zapier Prod Integration</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">ID: key_live_9381...7710</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-6')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: 22dd...55a1</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 6 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-6">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "developer.token.revoke",
+  "token_id": "key_live_9381...7710",
+  "reason": "scheduled_quarterly_rotation",
+  "grace_draining_minutes": 15
+}</pre>
+</div>
+</td>
+</tr>
+<!-- Row 7: Workspace Project Hard Deleted -->
+<tr class="hover:bg-surface-container/60 transition-colors group">
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+              24/10/2024 <span class="text-primary font-medium">09:44:31.218</span>
+</td>
+<td class="py-3 px-3 whitespace-nowrap">
+<div class="flex items-center gap-1.5">
+<span class="h-5 px-2 rounded font-mono-data text-[11px] bg-error-container text-on-error-container font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">delete_forever</span>
+<span>WORKSPACE_PURGE_RECORD</span>
+</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Portrait of senior corporate engineer Lucas Rocha, calm expression, sharp obsidian-inspired lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHE9aeXCRyHgZjd838zYPukhtrRlsGrG-5Sn_FwE6d9Ou24ooKSrrN5IHq2SwTRt4c2iuvaKaZ-c2jY4hpspnQf0uS9Clc78wi2j4yU1b16DFb4pqbJ7d6ezQBstH3APX0OM4qsqU0VFkUimujRZkXcylr2ivyzY4kUSIEzav7vWVoxlD4NIjP95fXDS4lAAbkKNc8PAujW7jNOaPs63AiHy2K25SVG4rpdxJiMox3a4cNh9tVF-NjyA"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary leading-tight">Lucas Rocha</span>
+<span class="font-mono-data text-[10px] text-outline">lucas.rocha@taskly.io</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-4 font-mono-data text-[12px] whitespace-nowrap text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span>187.120.44.19</span>
+<span class="text-outline text-[11px]">(São Paulo, BR)</span>
+</div>
+</td>
+<td class="py-3 px-4 whitespace-nowrap">
+<span class="font-label-md text-label-md text-error">Projeto Legado 2021 (Expurgado)</span>
+<span class="block font-mono-data text-[11px] text-on-surface-variant">LGPD Direito ao Esquecimento (#REQ-991)</span>
+</td>
+<td class="py-3 px-4 text-right whitespace-nowrap">
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[11px] inline-flex items-center gap-1 transition-colors" onclick="togglePayload('payload-7')">
+<span class="material-symbols-outlined text-[13px]">data_object</span>
+<span>SHA: 00b4...882e</span>
+</button>
+</td>
+</tr>
+<!-- Payload Drawer 7 -->
+<tr class="hidden bg-surface-container-lowest" id="payload-7">
+<td class="p-4 font-mono-data text-[11px] text-on-surface-variant" colspan="6">
+<div class="p-3 rounded bg-surface-container-high flex flex-col gap-1.5">
+<pre class="text-primary font-mono-data overflow-x-auto leading-relaxed">{
+  "action": "gdpr.rtbf.hard_purge",
+  "dpo_authorized_by": "dpo@taskly.io",
+  "records_destroyed": 1842,
+  "cryptographic_erasure": true,
+  "ledger_certificate_id": "CERT-LGPD-2024-10-882"
+}</pre>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="flex flex-col sm:flex-row items-center justify-between p-3 bg-surface-container text-on-surface-variant font-label-sm text-label-sm gap-2">
+<div class="flex items-center gap-2">
+<span>Mostrando 7 de 4.892 eventos</span>
+<span class="text-outline">•</span>
+<span class="font-mono-data text-[11px]">Trilha assinada sob padrão RFC 6962</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="h-7 px-2.5 rounded bg-surface-container-high hover:text-primary disabled:opacity-40 transition-colors" disabled="">Anterior</button>
+<button class="h-7 w-7 rounded bg-primary text-on-primary font-medium flex items-center justify-center">1</button>
+<button class="h-7 w-7 rounded hover:bg-surface-container-high hover:text-primary transition-colors flex items-center justify-center">2</button>
+<button class="h-7 w-7 rounded hover:bg-surface-container-high hover:text-primary transition-colors flex items-center justify-center">3</button>
+<span class="px-1 text-outline">...</span>
+<button class="h-7 w-7 rounded hover:bg-surface-container-high hover:text-primary transition-colors flex items-center justify-center">699</button>
+<button class="h-7 px-2.5 rounded bg-surface-container-high hover:text-primary transition-colors">Próximo</button>
+</div>
+</div>
+</div>
+<!-- Retention Policies, SIEM & Automated Incident Rules -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-md">
+<!-- SIEM / Telemetry Connector Panel -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">hub</span>
+<span class="font-headline-sm text-headline-sm text-primary">Exportadores &amp; Integração SIEM</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+          Conectado
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+        Logs são espelhados em tempo real sem buffer intermediário via TLS 1.3 mútuo (mTLS) para seu data lake corporativo.
+      </p>
+<div class="flex flex-col gap-2">
+<!-- Connector 1: Datadog -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-secondary">database</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Datadog Logs &amp; Cloud SIEM</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Endpoint: http-intake.logs.datadoghq.com</span>
+</div>
+</div>
+<span class="font-mono-kbd text-mono-kbd px-2 py-0.5 rounded bg-surface-container-high text-tertiary-fixed-dim">STREAM ATIVO</span>
+</div>
+<!-- Connector 2: Splunk -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed">insights</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Splunk HEC (HTTP Event Collector)</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Index: corp_taskly_secops_tier1</span>
+</div>
+</div>
+<span class="font-mono-kbd text-mono-kbd px-2 py-0.5 rounded bg-surface-container-high text-tertiary-fixed-dim">SYNC 100%</span>
+</div>
+<!-- Connector 3: Amazon S3 WORM Vault -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-outline">archive</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">AWS S3 Glacier Vault (Object Lock)</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Modo Compliance (Retenção 365d Imutável)</span>
+</div>
+</div>
+<span class="font-mono-kbd text-mono-kbd px-2 py-0.5 rounded bg-surface-container-high text-outline">RETENÇÃO ATIVA</span>
+</div>
+</div>
+</div>
+<!-- Automated InfoSec Alert Rules -->
+<div class="flex flex-col p-4 rounded bg-surface-container-low shadow-sm">
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary">notifications_active</span>
+<span class="font-headline-sm text-headline-sm text-primary">Gatilhos de Alerta Automático</span>
+</div>
+<button class="h-6 px-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-colors">
+          Gerenciar Regras
+        </button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+        Notificações de alta prioridade enviadas automaticamente para o time de CyberSec &amp; Compliance via PagerDuty e Slack.
+      </p>
+<div class="flex flex-col gap-2">
+<!-- Rule 1 -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Múltiplas Falhas de Autenticação</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">&gt; 5 falhas no período de 3 minutos por IP</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-kbd text-mono-kbd px-1.5 py-0.5 rounded bg-error-container text-on-error-container">SEV-1</span>
+<span class="font-label-sm text-label-sm text-primary">PagerDuty</span>
+</div>
+</div>
+<!-- Rule 2 -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Exportação Massiva de Dados</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">&gt; 1.000 entidades de workspace em lote</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-kbd text-mono-kbd px-1.5 py-0.5 rounded bg-surface-container-highest text-secondary-fixed">SEV-2</span>
+<span class="font-label-sm text-label-sm text-primary">#sec-alerts</span>
+</div>
+</div>
+<!-- Rule 3 -->
+<div class="flex items-center justify-between p-2.5 rounded bg-surface-container">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Elevação para Super Admin / Billing</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Qualquer alteração em permissões com escopo irrestrito</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-kbd text-mono-kbd px-1.5 py-0.5 rounded bg-surface-container-highest text-tertiary-fixed-dim">AUDIT</span>
+<span class="font-label-sm text-label-sm text-primary">Email DPO</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function togglePayload(rowId) {
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    if (row.classList.contains('hidden')) {
+      row.classList.remove('hidden');
+    } else {
+      row.classList.add('hidden');
+    }
+  }
+
+  // Quick feedback for Hash Verification
+  const verifyBtn = document.getElementById('btn-verify-hash');
+  if (verifyBtn) {
+    verifyBtn.addEventListener('click', () => {
+      const originalText = verifyBtn.innerHTML;
+      verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim animate-spin">refresh</span><span>Validando Blocos...</span>';
+      setTimeout(() => {
+        verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">check_circle</span><span>Trilha 100% Íntegra</span>';
+        setTimeout(() => {
+          verifyBtn.innerHTML = originalText;
+        }, 3000);
+      }, 1000);
+    });
+  }
+</script></main></div></body></html>

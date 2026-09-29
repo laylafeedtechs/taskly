@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+  }
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+}
+::-webkit-scrollbar {
+  display: none;
+}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "inverse-surface": "#e5e2e1",
+        "inverse-on-surface": "#313030",
+        "error": "#ffb4ab",
+        "surface-container-high": "#2a2a2a",
+        "on-error-container": "#ffdad6",
+        "on-tertiary-fixed": "#002113",
+        "secondary-fixed-dim": "#adc6ff",
+        "tertiary-container": "#6ffbbe",
+        "on-surface-variant": "#c4c7c8",
+        "secondary-fixed": "#d8e2ff",
+        "on-tertiary-container": "#00734e",
+        "on-background": "#e5e2e1",
+        "secondary-container": "#0566d9",
+        "surface-tint": "#c6c6c7",
+        "surface-container-low": "#1c1b1b",
+        "on-secondary-container": "#e6ecff",
+        "on-primary-fixed": "#1a1c1c",
+        "on-primary-fixed-variant": "#454747",
+        "on-tertiary-fixed-variant": "#005236",
+        "surface-container-lowest": "#0e0e0e",
+        "primary-container": "#e2e2e2",
+        "primary-fixed": "#e2e2e2",
+        "primary-fixed-dim": "#c6c6c7",
+        "on-secondary-fixed-variant": "#004395",
+        "inverse-primary": "#5d5f5f",
+        "on-primary-container": "#636565",
+        "on-secondary-fixed": "#001a42",
+        "surface-bright": "#3a3939",
+        "on-tertiary": "#003824",
+        "surface-container": "#201f1f",
+        "on-error": "#690005",
+        "outline": "#8e9192",
+        "surface-container-highest": "#353534",
+        "on-surface": "#e5e2e1",
+        "tertiary-fixed-dim": "#4edea3",
+        "on-secondary": "#002e6a",
+        "primary": "#ffffff",
+        "on-primary": "#2f3131",
+        "secondary": "#adc6ff",
+        "background": "#131313",
+        "outline-variant": "#444748",
+        "tertiary": "#ffffff",
+        "error-container": "#93000a",
+        "surface-dim": "#131313",
+        "surface-variant": "#353534",
+        "surface": "#131313",
+        "tertiary-fixed": "#6ffbbe"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "space-lg": "1rem",
+        "space-xs": "0.25rem",
+        "space-md": "0.75rem",
+        "space-xl": "1.5rem",
+        "space-sm": "0.5rem",
+        "margin-desktop": "2rem",
+        "margin": "1rem",
+        "gutter-desktop": "1.5rem",
+        "gutter": "1rem"
+      },
+      "fontFamily": {
+        "body-sm": ["Inter"],
+        "label-sm": ["Inter"],
+        "headline-xl": ["Inter"],
+        "headline-sm": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-md": ["Inter"],
+        "mono-kbd": ["JetBrains Mono"],
+        "headline-md": ["Inter"],
+        "headline-xl-mobile": ["Inter"],
+        "headline-lg": ["Inter"],
+        "mono-data": ["JetBrains Mono"]
+      },
+      "fontSize": {
+        "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+        "headline-sm": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+        "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+        "body-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "500" }],
+        "mono-kbd": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-md": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+        "headline-xl-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "mono-data": ["12px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+      }
+    }
+  }
+};
+</script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased select-none">
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 overflow-y-auto px-space-md pt-space-lg gap-space-md">
+<div class="flex items-center justify-between px-space-sm pb-space-sm border-b border-outline-variant/20">
+<div class="flex items-center gap-space-sm min-w-0">
+<img alt="Taskly Brand Logo" class="h-7 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1XsA0-7F5FX4b_HEAnWccv8JjbVG5LQeRda76dAfhlYqQVDYwBoQCUja2jZFuvQlduKmMGdOKuPvvEvpynkr4fuX_uBAyIYCrk37iY58p4r-4GjfVFnDgKZWu7cJXphh-rqkzhPFd_AUx5b77ev5arZlRLXf1u3GiMNqkp3Y45aM05a4JAi767Gyh2RiYH4I4kVBrdknKjOCCShgDRXZLVua8KhdYOeEvx5vCBYDpBOFdl5BSsyKLBa69Lt"/>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-primary truncate leading-none tracking-tight">Taskly</span>
+<div class="flex items-center gap-1 mt-1 cursor-pointer group">
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors truncate">Minha Empresa</span>
+<span class="material-symbols-outlined text-[13px] text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+</div>
+</div>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">unfold_more</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-xs">
+<button class="w-full flex items-center justify-between bg-primary text-on-primary font-label-md text-label-md py-1.5 px-3 rounded hover:bg-primary-fixed transition-colors shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Nova Tarefa</span>
+</div>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest/20 text-on-primary border border-surface-container-lowest/30">C</kbd>
+</button>
+<button class="w-full flex items-center justify-between bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md py-1.5 px-3 rounded border border-outline-variant/30 transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar...</span>
+</div>
+<div class="flex items-center gap-0.5">
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">Ctrl</kbd>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">K</kbd>
+</div>
+</button>
+</div>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Navegação</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="dashboard" href="#">
+<span>Dashboard</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="projects" href="#">
+<span>Projetos</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="my-tasks" href="#">
+<span>Minhas tarefas</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="kanban" href="#">
+<span>Kanban</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="calendar" href="#">
+<span>Calendário</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="reports" href="#">
+<span>Relatórios</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="notifications" href="#">
+<span>Notificações</span>
+<span class="font-mono-data text-[11px] px-1.5 py-0.2 rounded bg-surface-container-high text-primary border border-outline-variant/40 font-medium">3</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 flex items-center justify-between">
+<span class="font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Workspaces</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors" title="Adicionar Workspace">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-website" href="#">
+<span>Website</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-marketing" href="#">
+<span>Marketing</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-desenvolvimento" href="#">
+<span>Desenvolvimento</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-financeiro" href="#">
+<span>Financeiro</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors border border-dashed border-outline-variant/30 mt-1" data-path="new-workspace" href="#">
+<span>+ Novo workspace</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs pb-space-md" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Administração</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin" href="#">
+<span>Admin Panel</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin-logs" href="#">
+<span>Logs de Auditoria</span>
+</a>
+</nav>
+</div>
+<div class="p-space-sm border-t border-outline-variant/30 bg-surface-container-lowest/80">
+<div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-tertiary-fixed-dim ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium truncate leading-none">Lucas Rocha</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">Admin</span>
+</div>
+</div>
+<div class="flex items-center gap-0.5">
+<a class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors flex items-center justify-center" data-path="settings" href="#" title="Configurações">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</a>
+</div>
+</div>
+</div>
+</aside>
+<div class="pl-64">
+<header class="fixed top-0 left-64 right-0 h-14 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/20 z-40 flex items-center justify-between px-gutter-desktop">
+<div class="flex items-center gap-2">
+<div class="flex items-center text-on-surface-variant font-label-md text-label-md gap-1.5">
+<span class="hover:text-primary cursor-pointer transition-colors">Taskly</span>
+<span class="text-outline-variant">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Minha Empresa</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-medium">Workspace</span>
+</div>
+<div class="ml-4 flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant font-mono-data text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span>Sincronizado</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<nav class="hidden lg:flex items-center gap-space-md text-label-md font-label-md" data-active-classes="text-primary font-medium">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="docs" href="#">Documentação</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="help" href="#">Ajuda</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="changelog" href="#">Changelog</a>
+</nav>
+<div class="h-4 w-px bg-outline-variant/40 hidden lg:block"></div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Filtros e Visualização">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Feedback">
+<span class="material-symbols-outlined text-[18px]">feedback</span>
+</button>
+<a class="block" data-path="settings" href="#" title="Perfil e Configurações">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/30 hover:ring-primary transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+</a>
+</div>
+</div>
+</header>
+<main class="relative pt-14 min-h-screen bg-surface-container-lowest w-full px-gutter-desktop py-space-xl"><div class="flex flex-col w-full">
+<!-- Subtle ambient decorative glow -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="absolute top-1/2 -left-20 w-80 h-80 bg-secondary-container/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-lg mb-space-xl">
+<div class="flex flex-col gap-1 max-w-3xl">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-mono-kbd text-mono-kbd text-outline tracking-wider uppercase">Preferências Gerais</span>
+<span class="text-outline-variant font-mono-data text-body-sm">•</span>
+<span class="font-mono-data text-body-sm text-tertiary-fixed-dim flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+            Conta Ativa
+          </span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tight">Configurações da Conta</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Personalize sua experiência no Taskly, gerencie dados de perfil, credenciais de segurança e preferências da interface.
+        </p>
+</div>
+<!-- Quick action telemetry / status chip -->
+<div class="flex items-center gap-2 self-start md:self-end bg-surface-container-high px-3 py-2 rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">verified_user</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-medium leading-none">Proteção de Nível Máximo</span>
+<span class="font-mono-kbd text-mono-kbd text-outline mt-0.5">Sessão protegida por FIDO2 &amp; TOTP</span>
+</div>
+</div>
+</div>
+<!-- Main Settings Architecture: Nav Tabs / Subsections Split -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Sticky Navigation Column (Subsections) -->
+<div class="lg:col-span-3 sticky top-20 flex flex-col gap-1 bg-surface-container-low p-2 rounded-xl shadow-md">
+<div class="px-3 py-2 font-mono-kbd text-mono-kbd text-outline uppercase tracking-wider">
+          Seções do Perfil
+        </div>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-surface-container-highest text-primary font-label-md text-label-md transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">badge</span>
+<span>Perfil &amp; Identidade</span>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">security</span>
+<span class="font-label-md text-label-md">Segurança &amp; Autenticação</span>
+</div>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-tertiary-container/20 text-on-tertiary-container font-medium">2FA</span>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">notifications_active</span>
+<span class="font-label-md text-label-md">Preferências de Notificações</span>
+</div>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">keyboard</span>
+<span class="font-label-md text-label-md">Atalhos de Teclado</span>
+</div>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.2 rounded bg-surface-container-high text-outline">Ctrl+K</kbd>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">dark_mode</span>
+<span class="font-label-md text-label-md">Aparência &amp; Tema</span>
+</div>
+<span class="font-mono-kbd text-[10px] text-outline uppercase">Obsidian</span>
+</button>
+<button class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors text-left group" type="button">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">hub</span>
+<span class="font-label-md text-label-md">Integrações Conectadas</span>
+</div>
+<div class="flex -space-x-1.5 overflow-hidden">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+</button>
+<!-- Danger Navigation Anchor -->
+<div class="pt-3 mt-2">
+<button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 transition-colors text-left font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+<span>Zona de Perigo</span>
+</button>
+</div>
+</div>
+<!-- Core Content Column -->
+<div class="lg:col-span-9 flex flex-col gap-space-xl">
+<!-- 1. CARTÃO 'PERFIL PESSOAL' -->
+<section class="bg-surface-container-low rounded-xl p-space-xl shadow-lg relative flex flex-col gap-space-lg">
+<div class="flex items-start justify-between flex-wrap gap-space-md">
+<div class="flex flex-col">
+<span class="font-mono-kbd text-mono-kbd text-outline uppercase tracking-wider">Identidade Central</span>
+<h2 class="font-headline-md text-headline-md text-primary mt-0.5">Perfil Pessoal</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Informações visíveis em projetos, menções e atividades colaborativas da organização.</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-lg">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-mono-data text-body-sm text-on-surface">Workspace Owner</span>
+</div>
+</div>
+<!-- Avatar Section -->
+<div class="flex flex-col sm:flex-row items-center sm:items-start gap-space-lg bg-surface-container p-space-lg rounded-xl">
+<div class="relative group">
+<img class="w-24 h-24 rounded-2xl object-cover shadow-xl" data-alt="Close up professional portrait of Lucas Rocha, a focused modern tech lead with short dark hair, wearing sleek minimalist dark apparel, set against a dark architectural concrete background with subtle neutral lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDs2WRa_8jbAy31Q5H1J4JNcryIEC8xCcFb1DchCu0Kin4UCmMSVgfhEwFzghYQedqNzH1JbVhsKzzGU01gdaRMaYR2zqpym7zoQPpICf1YxLN3yfMn3sMzQVrBifiehHk5UlX65AZtBi3KGIfuqlW7WS6U_ZNzdQ_0riEK0u0RytP8GS3dnzN3b81ChFDd4EyBvRSusbZ_Jb2pnvUCa6QijkbOiJp4_EkrEDFBx7vEiP9VYoLc-u9L6g"/>
+<div class="absolute inset-0 bg-surface-container-lowest/60 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+<span class="material-symbols-outlined text-primary text-[24px]">photo_camera</span>
+</div>
+</div>
+<div class="flex flex-col gap-2 flex-1 text-center sm:text-left">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">Lucas Rocha</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">JPG, PNG ou WebP. Tamanho máximo recomendado de 4MB.</span>
+</div>
+<div class="flex items-center justify-center sm:justify-start gap-2 pt-1">
+<button class="bg-primary text-on-primary hover:bg-primary-container px-3 py-1.5 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">upload</span>
+<span>Alterar foto</span>
+</button>
+<button class="bg-surface-container-highest text-on-surface-variant hover:text-error hover:bg-surface-container-high px-3 py-1.5 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+<span>Remover</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Profile Input Form Grid -->
+<form class="grid grid-cols-1 md:grid-cols-2 gap-space-md" onsubmit="event.preventDefault();">
+<!-- Nome Completo -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Nome Completo</label>
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors w-full" placeholder="Seu nome" type="text" value="Lucas Rocha"/>
+</div>
+<!-- E-mail Corporativo -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-on-surface-variant">E-mail Corporativo</label>
+<span class="flex items-center gap-1 font-mono-data text-[11px] text-tertiary-fixed-dim bg-on-tertiary-fixed-variant/40 px-2 py-0.5 rounded-md">
+<span class="material-symbols-outlined text-[13px]">check_circle</span>
+                  Verificado
+                </span>
+</div>
+<div class="relative flex items-center">
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 pr-10 outline-none focus:bg-surface-container-high transition-colors w-full" placeholder="email@empresa.com" type="email" value="lucas.rocha@taskly.io"/>
+<span class="material-symbols-outlined absolute right-3 text-outline text-[18px] pointer-events-none">mail</span>
+</div>
+</div>
+<!-- Cargo / Função -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Cargo / Atribuição</label>
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors w-full" type="text" value="Tech Lead &amp; Workspace Owner"/>
+</div>
+<!-- Fuso Horário -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Fuso Horário</label>
+<div class="relative flex items-center">
+<select class="appearance-none bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 pr-10 outline-none focus:bg-surface-container-high transition-colors w-full cursor-pointer">
+<option selected="">América/São Paulo (GMT-3)</option>
+<option>UTC / Universal Time Coordinated</option>
+<option>América/Nova York (EST)</option>
+<option>Europa/Lisboa (GMT+0)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 text-outline text-[18px] pointer-events-none">schedule</span>
+</div>
+</div>
+<!-- Idioma da Interface -->
+<div class="flex flex-col gap-1.5 md:col-span-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Idioma da Interface</label>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-space-sm">
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container-highest cursor-pointer hover:bg-surface-container-high transition-colors">
+<input checked="" class="accent-primary w-4 h-4" name="lang" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary font-medium">Português (Brasil)</span>
+<span class="font-mono-kbd text-mono-kbd text-outline">Padrão do Workspace</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container cursor-pointer hover:bg-surface-container-high transition-colors">
+<input class="accent-primary w-4 h-4" name="lang" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium">English (US)</span>
+<span class="font-mono-kbd text-mono-kbd text-outline">International</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg bg-surface-container cursor-pointer hover:bg-surface-container-high transition-colors">
+<input class="accent-primary w-4 h-4" name="lang" type="radio"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-medium">Español</span>
+<span class="font-mono-kbd text-mono-kbd text-outline">Castellano</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Bio / Descrição de Trabalho -->
+<div class="flex flex-col gap-1.5 md:col-span-2">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Bio &amp; Contexto Operacional</label>
+<span class="font-mono-kbd text-mono-kbd text-outline">184 / 300 caracteres</span>
+</div>
+<textarea class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg p-3 outline-none focus:bg-surface-container-high transition-colors w-full resize-none" rows="3">Liderando arquitetura técnica, sprints de entrega contínua e governança de dados no ecossistema central do Taskly. Focado em ergonomia de software e design systems de ultra performance.</textarea>
+</div>
+<!-- Actions Bar -->
+<div class="md:col-span-2 flex items-center justify-between pt-2">
+<span class="font-mono-data text-body-sm text-outline flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+                Última sincronização há 4 minutos
+              </span>
+<button class="bg-primary text-on-primary hover:bg-primary-container px-5 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2 shadow-md" type="submit">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span>Salvar Alterações</span>
+</button>
+</div>
+</form>
+</section>
+<!-- 2. CARTÃO 'SEGURANÇA E ACESSO' -->
+<section class="bg-surface-container-low rounded-xl p-space-xl shadow-lg flex flex-col gap-space-lg">
+<div class="flex flex-col">
+<span class="font-mono-kbd text-mono-kbd text-outline uppercase tracking-wider">Criptografia &amp; Sessões</span>
+<h2 class="font-headline-md text-headline-md text-primary mt-0.5">Segurança e Acesso</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Gerencie mecanismos de autenticação de dois fatores, chaves de acesso e auditoria de dispositivos.</p>
+</div>
+<!-- Alteração de Senha Grid -->
+<div class="bg-surface-container p-space-lg rounded-xl flex flex-col gap-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">lock_reset</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Alterar Senha do Usuário</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Senha Atual</label>
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors" type="password" value="••••••••••••••••"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Nova Senha</label>
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors" placeholder="Mínimo de 12 caracteres" type="password"/>
+<!-- Strength indicator meter -->
+<div class="flex flex-col gap-1 mt-1">
+<div class="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden flex gap-1">
+<div class="bg-tertiary-fixed-dim w-1/4 h-full rounded-full"></div>
+<div class="bg-tertiary-fixed-dim w-1/4 h-full rounded-full"></div>
+<div class="bg-tertiary-fixed-dim w-1/4 h-full rounded-full"></div>
+<div class="bg-outline-variant w-1/4 h-full rounded-full"></div>
+</div>
+<span class="font-mono-kbd text-[10px] text-tertiary-fixed-dim text-right">Forte (75%)</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Confirmar Nova Senha</label>
+<input class="bg-surface-container-highest text-primary font-body-md text-body-md rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors" placeholder="Repita a nova senha" type="password"/>
+</div>
+</div>
+<div class="flex justify-end pt-1">
+<button class="bg-surface-container-highest text-primary hover:bg-surface-bright px-4 py-1.5 rounded-lg font-label-md text-label-md transition-colors" type="button">
+                Atualizar Senha
+              </button>
+</div>
+</div>
+<!-- Two-Factor Authentication (2FA) Feature Box -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md p-space-lg rounded-xl bg-surface-container">
+<div class="flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container/15 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[22px]">phonelink_lock</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-primary">Autenticação em Duas Etapas (2FA)</span>
+<span class="font-mono-data text-[11px] px-2 py-0.5 rounded bg-tertiary-container/20 text-on-tertiary-container font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                    Ativado
+                  </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                  Protegido via Aplicativo Autenticador (TOTP) padrão RFC 6238. Chave de recuperação gerada em 14/02/2025.
+                </p>
+</div>
+</div>
+<button class="bg-surface-container-highest text-primary hover:bg-surface-bright px-3 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2 self-start sm:self-center flex-shrink-0 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+<span>Reconfigurar 2FA</span>
+</button>
+</div>
+<!-- Sessões Ativas -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-primary">Dispositivos &amp; Sessões Ativas</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Revogue conexões não reconhecidas imediatamente.</span>
+</div>
+<button class="text-error hover:bg-error-container/20 px-3 py-1.5 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">logout</span>
+<span>Encerrar outras sessões</span>
+</button>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Session 1: Current -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">laptop_mac</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-primary font-medium">MacBook Pro M2 — São Paulo, Brasil</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.2 rounded bg-secondary-container/30 text-secondary-fixed font-medium">Esta Sessão</span>
+</div>
+<span class="font-mono-data text-body-sm text-outline">Chrome v122.0.6261 • IP 189.120.45.192</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-kbd text-[11px] text-tertiary-fixed-dim">Agora mesmo</span>
+</div>
+</div>
+<!-- Session 2: Mobile -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-lg bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">smartphone</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary font-medium">iPhone 15 Pro — São Paulo, Brasil</span>
+<span class="font-mono-data text-body-sm text-outline">Safari Mobile • Ativo há 42 minutos atrás</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error p-1.5 rounded-lg hover:bg-surface-container-high transition-colors" title="Desconectar este dispositivo" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. CARTÃO 'ATALHOS DE TECLADO & PRODUTIVIDADE' -->
+<section class="bg-surface-container-low rounded-xl p-space-xl shadow-lg flex flex-col gap-space-lg">
+<div class="flex items-start justify-between flex-wrap gap-2">
+<div class="flex flex-col">
+<span class="font-mono-kbd text-mono-kbd text-outline uppercase tracking-wider">Ergonomia &amp; Fluxo Rápido</span>
+<h2 class="font-headline-md text-headline-md text-primary mt-0.5">Atalhos de Teclado &amp; Produtividade</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Execute rotinas de criação, alternância de telas e busca sem tirar as mãos do teclado.</p>
+</div>
+<div class="flex items-center gap-1.5 font-mono-data text-[11px] text-outline bg-surface-container px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+<span>Modo Vim/Linear Ativo</span>
+</div>
+</div>
+<!-- Shortcuts Bento Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-md">
+<!-- Shortcut 1 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Busca Global &amp; Ações</span>
+<span class="material-symbols-outlined text-outline text-[18px]">search</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">Ctrl</kbd>
+<span class="text-outline font-mono-data text-body-sm">+</span>
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">K</kbd>
+</div>
+</div>
+<!-- Shortcut 2 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Criar Nova Tarefa</span>
+<span class="material-symbols-outlined text-outline text-[18px]">add_task</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="font-mono-kbd text-mono-kbd px-2.5 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">C</kbd>
+<span class="font-body-sm text-body-sm text-outline ml-2">em qualquer tela</span>
+</div>
+</div>
+<!-- Shortcut 3 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Ir para Dashboard</span>
+<span class="material-symbols-outlined text-outline text-[18px]">dashboard</span>
+</div>
+<div class="flex items-center gap-1.5">
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">G</kbd>
+<span class="font-mono-kbd text-[11px] text-outline">depois</span>
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">D</kbd>
+</div>
+</div>
+<!-- Shortcut 4 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Ir para Kanban</span>
+<span class="material-symbols-outlined text-outline text-[18px]">view_kanban</span>
+</div>
+<div class="flex items-center gap-1.5">
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">G</kbd>
+<span class="font-mono-kbd text-[11px] text-outline">depois</span>
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">K</kbd>
+</div>
+</div>
+<!-- Shortcut 5 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Ir para Calendário</span>
+<span class="material-symbols-outlined text-outline text-[18px]">calendar_month</span>
+</div>
+<div class="flex items-center gap-1.5">
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">G</kbd>
+<span class="font-mono-kbd text-[11px] text-outline">depois</span>
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">C</kbd>
+</div>
+</div>
+<!-- Shortcut 6 -->
+<div class="p-3.5 rounded-xl bg-surface-container flex flex-col justify-between gap-3 hover:bg-surface-container-high transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary font-medium">Fechar Modais &amp; Painéis</span>
+<span class="material-symbols-outlined text-outline text-[18px]">cancel</span>
+</div>
+<div class="flex items-center gap-1">
+<kbd class="font-mono-kbd text-mono-kbd px-2 py-1 rounded bg-surface-container-highest text-primary border-0 shadow-sm font-semibold">Esc</kbd>
+<span class="font-body-sm text-body-sm text-outline ml-2">descartar foco</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. CARTÃO 'ZONA DE PERIGO / EXCLUSÃO DE CONTA' -->
+<section class="bg-surface-container-low rounded-xl p-space-xl shadow-lg flex flex-col gap-space-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-error-container/30 flex items-center justify-center text-error flex-shrink-0">
+<span class="material-symbols-outlined text-[22px]">gavel</span>
+</div>
+<div class="flex flex-col">
+<span class="font-mono-kbd text-mono-kbd text-error uppercase tracking-wider">Ações Irreversíveis</span>
+<h2 class="font-headline-md text-headline-md text-error mt-0.5">Zona de Perigo &amp; Posse de Dados</h2>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Ao excluir sua conta, todos os registros de tarefas pessoais, integrações de API e tokens serão permanentemente apagados dos nossos servidores de replicação. Como você é o proprietário principal de 4 workspaces empresariais, é obrigatório transferir a propriedade antes do desligamento definitivo.
+          </p>
+<!-- Danger options box -->
+<div class="flex flex-col gap-space-md bg-surface-container p-space-lg rounded-xl">
+<!-- Option 1: Transfer ownership -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pb-space-md">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">Transferir Propriedade de Workspaces</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Designar outro administrador como responsável legal e financeiro do time.</span>
+</div>
+<button class="bg-surface-container-highest text-on-surface hover:text-primary hover:bg-surface-bright px-4 py-2 rounded-lg font-label-md text-label-md transition-colors flex-shrink-0 self-start sm:self-center" type="button">
+                Transferir Posse
+              </button>
+</div>
+<!-- Option 2: Account Deletion with Protection Input -->
+<div class="flex flex-col gap-space-md pt-space-md">
+<div class="flex flex-col gap-1">
+<span class="font-headline-sm text-headline-sm text-error">Excluir Conta Permanentemente</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+                  Para confirmar a exclusão sem reversão, digite o seu e-mail corporativo <strong class="text-primary font-mono-data">lucas.rocha@taskly.io</strong> no campo abaixo:
+                </span>
+</div>
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-md">
+<input class="bg-surface-container-highest text-primary font-mono-data text-body-sm rounded-lg px-3 py-2 outline-none focus:bg-surface-container-high transition-colors flex-1" id="confirmDeleteInput" placeholder="lucas.rocha@taskly.io" type="text"/>
+<button class="bg-error/20 text-error/40 px-5 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center justify-center gap-2 cursor-not-allowed" disabled="" id="btnDeleteAccount" type="button">
+<span class="material-symbols-outlined text-[18px]">delete_forever</span>
+<span>Excluir Permanentemente</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interaction for strict confirmation on account deletion
+  const deleteInput = document.getElementById('confirmDeleteInput');
+  const deleteBtn = document.getElementById('btnDeleteAccount');
+  const targetEmail = 'lucas.rocha@taskly.io';
+
+  if (deleteInput && deleteBtn) {
+    deleteInput.addEventListener('input', (e) => {
+      const isMatch = e.target.value.trim() === targetEmail;
+      if (isMatch) {
+        deleteBtn.removeAttribute('disabled');
+        deleteBtn.classList.remove('bg-error/20', 'text-error/40', 'cursor-not-allowed');
+        deleteBtn.classList.add('bg-error', 'text-on-error', 'hover:bg-error-container', 'shadow-md');
+      } else {
+        deleteBtn.setAttribute('disabled', 'true');
+        deleteBtn.classList.add('bg-error/20', 'text-error/40', 'cursor-not-allowed');
+        deleteBtn.classList.remove('bg-error', 'text-on-error', 'hover:bg-error-container', 'shadow-md');
+      }
+    });
+  }
+</script></main>
+</div>
+</body></html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+  }
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+}
+::-webkit-scrollbar {
+  display: none;
+}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "inverse-surface": "#e5e2e1",
+        "inverse-on-surface": "#313030",
+        "error": "#ffb4ab",
+        "surface-container-high": "#2a2a2a",
+        "on-error-container": "#ffdad6",
+        "on-tertiary-fixed": "#002113",
+        "secondary-fixed-dim": "#adc6ff",
+        "tertiary-container": "#6ffbbe",
+        "on-surface-variant": "#c4c7c8",
+        "secondary-fixed": "#d8e2ff",
+        "on-tertiary-container": "#00734e",
+        "on-background": "#e5e2e1",
+        "secondary-container": "#0566d9",
+        "surface-tint": "#c6c6c7",
+        "surface-container-low": "#1c1b1b",
+        "on-secondary-container": "#e6ecff",
+        "on-primary-fixed": "#1a1c1c",
+        "on-primary-fixed-variant": "#454747",
+        "on-tertiary-fixed-variant": "#005236",
+        "surface-container-lowest": "#0e0e0e",
+        "primary-container": "#e2e2e2",
+        "primary-fixed": "#e2e2e2",
+        "primary-fixed-dim": "#c6c6c7",
+        "on-secondary-fixed-variant": "#004395",
+        "inverse-primary": "#5d5f5f",
+        "on-primary-container": "#636565",
+        "on-secondary-fixed": "#001a42",
+        "surface-bright": "#3a3939",
+        "on-tertiary": "#003824",
+        "surface-container": "#201f1f",
+        "on-error": "#690005",
+        "outline": "#8e9192",
+        "surface-container-highest": "#353534",
+        "on-surface": "#e5e2e1",
+        "tertiary-fixed-dim": "#4edea3",
+        "on-secondary": "#002e6a",
+        "primary": "#ffffff",
+        "on-primary": "#2f3131",
+        "secondary": "#adc6ff",
+        "background": "#131313",
+        "outline-variant": "#444748",
+        "tertiary": "#ffffff",
+        "error-container": "#93000a",
+        "surface-dim": "#131313",
+        "surface-variant": "#353534",
+        "surface": "#131313",
+        "tertiary-fixed": "#6ffbbe"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "space-lg": "1rem",
+        "space-xs": "0.25rem",
+        "space-md": "0.75rem",
+        "space-xl": "1.5rem",
+        "space-sm": "0.5rem",
+        "margin-desktop": "2rem",
+        "margin": "1rem",
+        "gutter-desktop": "1.5rem",
+        "gutter": "1rem"
+      },
+      "fontFamily": {
+        "body-sm": ["Inter"],
+        "label-sm": ["Inter"],
+        "headline-xl": ["Inter"],
+        "headline-sm": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-md": ["Inter"],
+        "mono-kbd": ["JetBrains Mono"],
+        "headline-md": ["Inter"],
+        "headline-xl-mobile": ["Inter"],
+        "headline-lg": ["Inter"],
+        "mono-data": ["JetBrains Mono"]
+      },
+      "fontSize": {
+        "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+        "headline-sm": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+        "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+        "body-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "500" }],
+        "mono-kbd": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-md": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+        "headline-xl-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "mono-data": ["12px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+      }
+    }
+  }
+};
+</script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased select-none">
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 overflow-y-auto px-space-md pt-space-lg gap-space-md">
+<div class="flex items-center justify-between px-space-sm pb-space-sm border-b border-outline-variant/20">
+<div class="flex items-center gap-space-sm min-w-0">
+<img alt="Taskly Brand Logo" class="h-7 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1XsA0-7F5FX4b_HEAnWccv8JjbVG5LQeRda76dAfhlYqQVDYwBoQCUja2jZFuvQlduKmMGdOKuPvvEvpynkr4fuX_uBAyIYCrk37iY58p4r-4GjfVFnDgKZWu7cJXphh-rqkzhPFd_AUx5b77ev5arZlRLXf1u3GiMNqkp3Y45aM05a4JAi767Gyh2RiYH4I4kVBrdknKjOCCShgDRXZLVua8KhdYOeEvx5vCBYDpBOFdl5BSsyKLBa69Lt"/>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-primary truncate leading-none tracking-tight">Taskly</span>
+<div class="flex items-center gap-1 mt-1 cursor-pointer group">
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors truncate">Minha Empresa</span>
+<span class="material-symbols-outlined text-[13px] text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+</div>
+</div>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">unfold_more</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-xs">
+<button class="w-full flex items-center justify-between bg-primary text-on-primary font-label-md text-label-md py-1.5 px-3 rounded hover:bg-primary-fixed transition-colors shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Nova Tarefa</span>
+</div>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest/20 text-on-primary border border-surface-container-lowest/30">C</kbd>
+</button>
+<button class="w-full flex items-center justify-between bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md py-1.5 px-3 rounded border border-outline-variant/30 transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar...</span>
+</div>
+<div class="flex items-center gap-0.5">
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">Ctrl</kbd>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">K</kbd>
+</div>
+</button>
+</div>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Navegação</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="dashboard" href="#">
+<span>Dashboard</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="projects" href="#">
+<span>Projetos</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="my-tasks" href="#">
+<span>Minhas tarefas</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="kanban" href="#">
+<span>Kanban</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="calendar" href="#">
+<span>Calendário</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="reports" href="#">
+<span>Relatórios</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="notifications" href="#">
+<span>Notificações</span>
+<span class="font-mono-data text-[11px] px-1.5 py-0.2 rounded bg-surface-container-high text-primary border border-outline-variant/40 font-medium">3</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 flex items-center justify-between">
+<span class="font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Workspaces</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors" title="Adicionar Workspace">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-website" href="#">
+<span>Website</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-marketing" href="#">
+<span>Marketing</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-desenvolvimento" href="#">
+<span>Desenvolvimento</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-financeiro" href="#">
+<span>Financeiro</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors border border-dashed border-outline-variant/30 mt-1" data-path="new-workspace" href="#">
+<span>+ Novo workspace</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs pb-space-md" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Administração</div>
+<a aria-current="page" class="flex items-center justify-between px-space-sm py-1.5 rounded transition-colors group bg-surface-container-high text-primary font-medium" data-path="admin" href="#">
+<span>Admin Panel</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin-logs" href="#">
+<span>Logs de Auditoria</span>
+</a>
+</nav>
+</div>
+<div class="p-space-sm border-t border-outline-variant/30 bg-surface-container-lowest/80">
+<div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-tertiary-fixed-dim ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium truncate leading-none">Lucas Rocha</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">Admin</span>
+</div>
+</div>
+<div class="flex items-center gap-0.5">
+<a class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors flex items-center justify-center" data-path="settings" href="#" title="Configurações">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</a>
+</div>
+</div>
+</div>
+</aside>
+<div class="pl-64">
+<header class="fixed top-0 left-64 right-0 h-14 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/20 z-40 flex items-center justify-between px-gutter-desktop">
+<div class="flex items-center gap-2">
+<div class="flex items-center text-on-surface-variant font-label-md text-label-md gap-1.5">
+<span class="hover:text-primary cursor-pointer transition-colors">Taskly</span>
+<span class="text-outline-variant">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Minha Empresa</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-medium">Workspace</span>
+</div>
+<div class="ml-4 flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant font-mono-data text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span>Sincronizado</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<nav class="hidden lg:flex items-center gap-space-md text-label-md font-label-md" data-active-classes="text-primary font-medium">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="docs" href="#">Documentação</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="help" href="#">Ajuda</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="changelog" href="#">Changelog</a>
+</nav>
+<div class="h-4 w-px bg-outline-variant/40 hidden lg:block"></div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Filtros e Visualização">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Feedback">
+<span class="material-symbols-outlined text-[18px]">feedback</span>
+</button>
+<a class="block" data-path="settings" href="#" title="Perfil e Configurações">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/30 hover:ring-primary transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+</a>
+</div>
+</div>
+</header>
+<main class="relative pt-14 min-h-screen bg-surface-container-lowest w-full px-gutter-desktop py-space-xl"><div class="flex flex-col w-full">
+<div class="flex flex-col gap-space-lg mb-space-xl">
+<div class="flex flex-wrap items-center justify-between gap-space-md">
+<div class="flex flex-col gap-1 min-w-0">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-mono-data text-mono-data">
+<span>Taskly</span>
+<span class="text-outline">/</span>
+<span>Governança Corporativa</span>
+<span class="text-outline">/</span>
+<span class="text-primary font-medium">Administração Global</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1">
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tight">Painel de Administração Global</h1>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface font-mono-kbd text-[11px] shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+            Ambiente Protegido • Acesso SuperAdmin
+          </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-3xl">
+          Supervisão executiva, monitoramento de saúde do sistema, auditoria e controle de acessos da plataforma.
+        </p>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="inline-flex items-center gap-2 bg-surface-container-high text-on-surface font-label-md text-label-md py-2 px-3.5 rounded hover:bg-surface-bright transition-colors shadow-sm" id="btn-export">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Exportar Relatório Geral</span>
+</button>
+<button class="inline-flex items-center gap-2 bg-surface-container-high text-on-surface font-label-md text-label-md py-2 px-3.5 rounded hover:bg-surface-bright transition-colors shadow-sm" id="btn-logs-jump">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+<span>Logs em Tempo Real</span>
+</button>
+<button class="inline-flex items-center gap-2 bg-primary text-on-primary font-label-md text-label-md py-2 px-4 rounded hover:bg-primary-fixed transition-colors shadow-md" id="btn-open-modal">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+<span>+ Convidar / Criar Usuário</span>
+</button>
+</div>
+</div>
+</div>
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-space-md mb-space-xl">
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Usuários Cadastrados</span>
+<span class="material-symbols-outlined text-[18px] text-outline">group</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary font-semibold tracking-tight">1.284</span>
+<span class="inline-flex items-center text-on-tertiary-container bg-tertiary-container/10 px-1.5 py-0.5 rounded font-mono-data text-[11px]">
+          +2.4%
+        </span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-mono-data text-[11px]">
+<span>+18 novos esta semana</span>
+<svg class="w-12 h-4 text-tertiary-fixed-dim" fill="none" viewbox="0 0 48 16">
+<path d="M1 14 L12 11 L24 13 L36 6 L47 2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+</div>
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Usuários Ativos</span>
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">bolt</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary font-semibold tracking-tight">937</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">/ 30 dias</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-tertiary-fixed-dim h-full rounded-full" style="width: 73%"></div>
+</div>
+<span class="font-mono-data text-[11px] text-on-surface font-medium">73%</span>
+</div>
+</div>
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Usuários Bloqueados</span>
+<span class="material-symbols-outlined text-[18px] text-error">lock</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-error font-semibold tracking-tight">12</span>
+<span class="font-mono-data text-[11px] text-error font-medium">Quarentena</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-mono-data text-[11px]">
+<span>Sob auditoria técnica</span>
+<span class="text-error font-mono-kbd">REV-09</span>
+</div>
+</div>
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Workspaces Ativos</span>
+<span class="material-symbols-outlined text-[18px] text-secondary">grid_view</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary font-semibold tracking-tight">342</span>
+<span class="font-mono-data text-[11px] text-secondary font-medium">Estáveis</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-mono-data text-[11px]">
+<span>Distribuídos em 89 orgs</span>
+<span class="text-outline font-mono-kbd">TENANT</span>
+</div>
+</div>
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Projetos Registrados</span>
+<span class="material-symbols-outlined text-[18px] text-outline">folder_special</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary font-semibold tracking-tight">1.892</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">total</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-mono-data text-[11px]">
+<span class="text-primary font-medium">1.420 em execução</span>
+<span class="text-tertiary-fixed-dim font-mono-kbd">75.1%</span>
+</div>
+</div>
+<div class="relative overflow-hidden bg-surface-container-low rounded-lg p-space-md flex flex-col justify-between shadow-sm hover:bg-surface-container transition-colors">
+<div class="flex items-center justify-between">
+<span class="font-mono-kbd text-[11px] uppercase tracking-wider text-outline">Tarefas na Plataforma</span>
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed-dim">task_alt</span>
+</div>
+<div class="my-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary font-semibold tracking-tight">24.391</span>
+<span class="font-mono-data text-[11px] text-outline">ciclo</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-mono-data text-[11px]">
+<span class="text-on-surface">19.840 concluídas</span>
+<span class="font-mono-kbd text-tertiary-fixed-dim">81.3%</span>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-low rounded-lg p-space-lg mb-space-xl shadow-md">
+<div class="flex flex-col gap-space-md mb-space-lg">
+<div class="flex flex-wrap items-center justify-between gap-space-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary tracking-tight">Gerenciamento de Identidades &amp; Contas</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Visão consolidada de todas as credenciais vinculadas a este tenant global.</p>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-mono-data text-mono-data">
+<span class="inline-block w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span id="filtered-counter">Mostrando 6 de 1.284 contas</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-sm pt-space-xs">
+<div class="md:col-span-4 relative">
+<span class="material-symbols-outlined absolute left-3 top-2 text-[18px] text-outline">search</span>
+<input class="w-full bg-surface-container-highest text-on-surface placeholder:text-outline font-body-md text-body-md pl-9 pr-3 py-1.5 rounded focus:outline-none focus:bg-surface-bright transition-colors" id="user-search" placeholder="Buscar por Nome ou E-mail..." type="text"/>
+</div>
+<div class="md:col-span-3">
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md px-3 py-1.5 rounded focus:outline-none focus:bg-surface-bright transition-colors cursor-pointer" id="role-filter">
+<option value="ALL">Todas as Funções</option>
+<option value="SUPERADMIN">SuperAdmin</option>
+<option value="WORKSPACE_ADMIN">Admin de Workspace</option>
+<option value="MEMBRO">Membro</option>
+<option value="CONVIDADO">Convidado</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-[18px] text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="md:col-span-3">
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md px-3 py-1.5 rounded focus:outline-none focus:bg-surface-bright transition-colors cursor-pointer" id="status-filter">
+<option value="ALL">Todos os Status</option>
+<option value="ATIVO">Ativo</option>
+<option value="BLOQUEADO">Bloqueado</option>
+<option value="PENDENTE">Pendente</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-[18px] text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="md:col-span-2">
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md px-3 py-1.5 rounded focus:outline-none focus:bg-surface-bright transition-colors cursor-pointer" id="sort-order">
+<option value="RECIPROCAL">Último Acesso (Recente)</option>
+<option value="NAME_ASC">Nome (A - Z)</option>
+<option value="ROLE_DESC">Permissão (Maior)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2 text-[18px] text-outline pointer-events-none">sort</span>
+</div>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto rounded">
+<table class="w-full text-left font-body-md text-body-md border-collapse">
+<thead>
+<tr class="bg-surface-container-high text-on-surface-variant font-mono-kbd text-[11px] uppercase tracking-wider">
+<th class="py-2.5 px-space-md">Usuário</th>
+<th class="py-2.5 px-space-md">E-mail corporativo</th>
+<th class="py-2.5 px-space-md">Status</th>
+<th class="py-2.5 px-space-md">Workspaces &amp; Projetos</th>
+<th class="py-2.5 px-space-md">Último Acesso</th>
+<th class="py-2.5 px-space-md">Nível de Permissão</th>
+<th class="py-2.5 px-space-md text-right">Ações</th>
+</tr>
+</thead>
+<tbody id="user-table-body">
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="lucas@taskly.internal" data-name="Lucas Rocha" data-role="SUPERADMIN" data-status="ATIVO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Close-up headshot of Lucas Rocha, a confident Brazilian systems architect and tech leader with dark hair, minimal studio lighting with deep graphite tones, shot on 85mm prime lens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvHJ3pyNkyjncsP7Ja9Nry4jWN1KGh1YziR9P7t1ymtp1AO0SXea_LZ2OEtUAeQgO51SDlAZqdlj-yuGeNHcsGyWxPB73Gweahg7QBtWSIUt6lrH5uU3psUVlouBE4dTbaBEIvyoLeEMi9nig90DiLECBkOFmdDbE4X24y6m8yjCaNMUGrRc9IJBbeaFinatbjQcN3xKWyrLUTwxq_u1UQJeKjptgEMoTPig3oTPbSvIcBCKnT1NbEkA"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-medium truncate">Lucas Rocha</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Global Platform Architect</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface">lucas@taskly.internal</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-container/10 text-on-tertiary-container font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                Ativo
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-on-surface">
+<span class="font-medium text-primary">5 Workspaces</span>
+<span class="text-outline"> • </span>
+<span class="text-on-surface-variant">28 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-tertiary-fixed-dim">Agora (Sessão ativa)</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-primary font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                SuperAdmin
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Editar Permissões">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Bloquear Conta">
+<span class="material-symbols-outlined text-[17px]">block</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="mariana.silva@empresa.com" data-name="Mariana Silva" data-role="WORKSPACE_ADMIN" data-status="ATIVO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Portrait of Mariana Silva, a Brazilian senior product director with glasses, modern professional office environment, soft moody lighting and deep contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDETqBXcJRPZQpUtt3MyYT-VEKO3lfyRfkU2BnnJR2BX9BgfAuK1psimPk0DjlyNxztk3BfdAs2oDkWebeMxK9HURwUzGaoFC1Yl3Fr_3kOjLVimhcVXOBmsx8QTAjpxGD99WrIuKgOH0p_MWUmbRKz90PrC6dfWSjiA6smFw19j9A_s_80tbEZKpHrFYirwtRUXSx9T9-Z1MeOqQbVvpuBYhVRT5u5qF7s-G0ZdBRmqymFuaeS5Ry1Pg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-medium truncate">Mariana Silva</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Product Operations Director</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface">mariana.silva@empresa.com</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-container/10 text-on-tertiary-container font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                Ativo
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-on-surface">
+<span class="font-medium text-primary">3 Workspaces</span>
+<span class="text-outline"> • </span>
+<span class="text-on-surface-variant">14 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface-variant">Há 12 minutos</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-secondary-container/20 text-secondary-fixed font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                Workspace Admin
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Editar Permissões">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Bloquear Conta">
+<span class="material-symbols-outlined text-[17px]">block</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="carlos.dev@empresa.com" data-name="Carlos Eduardo" data-role="MEMBRO" data-status="ATIVO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Headshot of Carlos Eduardo, a young senior software developer wearing dark hoodie, cinematic side lighting with subtle deep neutral shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_s7IOT_29YLxZk8fRKIDrpozojpQBLRskENZSZdFlkrMfB2EUXmVrPXDwq-kAQrP-SKEdnL7rZ3HFv8Dxk3NJNTZv3rJs5vK4miJF5Qo4WhvS2kcxTj0WeQTLCkCJvIqcyYGo88J3q8mEVNJaeHOAbzoHiqUpT28IAbhPgLizUlJgtosjBUDas18pQ9u4yRViXduYB1dJGvO8F39pEmjJkdqWQuw9fJiSOp0FFoZhbnjq1udpa7hgLg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-medium truncate">Carlos Eduardo</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Staff Tech Lead</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface">carlos.dev@empresa.com</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-container/10 text-on-tertiary-container font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                Ativo
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-on-surface">
+<span class="font-medium text-primary">2 Workspaces</span>
+<span class="text-outline"> • </span>
+<span class="text-on-surface-variant">9 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface-variant">Há 1 hora</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                Member
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Editar Permissões">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Bloquear Conta">
+<span class="material-symbols-outlined text-[17px]">block</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="fernanda@empresa.com" data-name="Fernanda Lins" data-role="MEMBRO" data-status="ATIVO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Professional studio photograph of Fernanda Lins, a marketing VP with natural pose, dark neutral background, subtle monochromatic ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHxyHuHKiRmBt26EBv7ZlIodMKt3v4n-RiwbVQtO3H-LQUmjiI8ntmE-MtvldsztwqA-5ORR-kRqkn2Nvm31Yi2n3MJFeo4rPFo0Go1qFcXovmAUoYsJs6pRPnfCx-ze8CSjdN58a-5yuLraNg_1MLvq1nHoPdy70A1hWgs_vm2BoYOYC44k_wyIr8SAGT7S9_HHp0p-DkEkRZke8AKDtIH0fqi1OH5LJfMF7ualIVqfdOhzgv3YOGeA"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-medium truncate">Fernanda Lins</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Growth &amp; Marketing Lead</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface">fernanda@empresa.com</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-container/10 text-on-tertiary-container font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                Ativo
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-on-surface">
+<span class="font-medium text-primary">1 Workspace</span>
+<span class="text-outline"> • </span>
+<span class="text-on-surface-variant">4 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface-variant">Há 5 horas</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                Member
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Editar Permissões">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Bloquear Conta">
+<span class="material-symbols-outlined text-[17px]">block</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="roberto@empresa.com" data-name="Roberto Paiva" data-role="WORKSPACE_ADMIN" data-status="ATIVO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover flex-shrink-0" data-alt="Portrait of Roberto Paiva, mature corporate finance executive with silver hair, sharp tailored dark shirt, soft rim lighting against dark slate background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8Su1iY3GAALqpEOjmjpc-N5wuWnTdfJzaMt-_AXn6pwruIEhOhwlAOTC4AQeTi0w1aCpVAHOfU8aLDNd_PbcWEkzv_oIyUQMd59Vjam_HY2XGf6qPhjOpLWCoQkPv0XQBakdksncSDrrqXAXnwV5n5CFbyD5xRnPEvX0q8D_WeofaIMk-4jwCfR_hEwkliaJHt4iJtVWL_OTYcZxQHLxGWkI9q_5nycUgGKVcBvhJQr8NKgr4xmir5w"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary font-medium truncate">Roberto Paiva</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Financeiro &amp; Operações</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface">roberto@empresa.com</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-container/10 text-on-tertiary-container font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                Ativo
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-on-surface">
+<span class="font-medium text-primary">2 Workspaces</span>
+<span class="text-outline"> • </span>
+<span class="text-on-surface-variant">5 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-on-surface-variant">Ontem às 18:22</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-secondary-container/20 text-secondary-fixed font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                Workspace Admin
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Editar Permissões">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors" title="Bloquear Conta">
+<span class="material-symbols-outlined text-[17px]">block</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="user-row bg-surface-container-low hover:bg-surface-container transition-colors" data-email="alex@consultoria.io" data-name="Alexandre Matos" data-role="CONVIDADO" data-status="BLOQUEADO">
+<td class="py-3 px-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<img class="w-8 h-8 rounded-full object-cover grayscale opacity-70 flex-shrink-0" data-alt="Portrait of Alexandre Matos, an external consultant with neutral serious expression, dark ambient tone, subtle key light, shot in high detail on 50mm lens." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZMNgGZq2ZhIJ4aOdI_AzvUMU_D7rXF-t_A9fQRMg9gkm6T4z5bY4Vx8Of4wqaMu2CZJDLqwFGCECFMY-fWM4xEXLXpTlKbMdEKI__o0D4cVIkwNqqtTCCemqHKlzXwK4EJH9TY9pywd6L2tEZrlhb55H1Zyq0mBxBuf5Cj9tifubAi1rdaBnY9YGH9u1Cq53oJESRXwIzv09J3DpXQsBw9m7pidvySIFcky8csUQW_-FXbQEl89AVkg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium truncate">Alexandre Matos</span>
+<span class="font-label-sm text-label-sm text-outline truncate">Auditor Externo Contratado</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-outline">alex@consultoria.io</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-error-container/20 text-error font-mono-kbd text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                Bloqueado
+              </span>
+</td>
+<td class="py-3 px-space-md font-body-sm text-body-sm text-outline">
+<span>0 Workspaces</span>
+<span> • </span>
+<span>0 Projetos</span>
+</td>
+<td class="py-3 px-space-md font-mono-data text-mono-data text-outline">14 Outubro, 10:14</td>
+<td class="py-3 px-space-md">
+<span class="inline-flex items-center px-2 py-0.5 rounded bg-surface-container text-outline font-mono-kbd text-[11px] font-medium uppercase tracking-wide">
+                Convidado
+              </span>
+</td>
+<td class="py-3 px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded text-tertiary-fixed-dim hover:bg-surface-container-high transition-colors" title="Desbloquear Conta">
+<span class="material-symbols-outlined text-[17px]">lock_open</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Ver Detalhes">
+<span class="material-symbols-outlined text-[17px]">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-space-md pt-space-lg">
+<div class="flex items-center gap-2 text-on-surface-variant font-mono-data text-mono-data">
+<span>Mostrando página 1 de 214</span>
+<span class="text-outline">•</span>
+<span>Itens por página: 6</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 rounded bg-surface-container-high text-outline hover:text-on-surface disabled:opacity-30 transition-colors" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 rounded bg-primary text-on-primary font-mono-data text-[12px] font-medium shadow-sm">1</button>
+<button class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[12px] transition-colors">2</button>
+<button class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[12px] transition-colors">3</button>
+<span class="px-2 text-outline font-mono-data text-[12px]">...</span>
+<button class="px-3 py-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary font-mono-data text-[12px] transition-colors">214</button>
+<button class="p-1.5 rounded bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-low rounded-lg p-space-lg shadow-md mb-space-xl" id="admin-audit-section">
+<div class="flex flex-wrap items-center justify-between gap-space-md pb-space-md">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[22px]">policy</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-primary tracking-tight">Logs Recentes de Auditoria Administrativa</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Trilha imutável de eventos de conformidade, segurança e controle de privilégios.</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm font-mono-kbd text-[11px]">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container-highest text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+          Streaming Ativo (Syslog v3)
+        </span>
+<a class="text-secondary hover:text-secondary-fixed transition-colors font-medium flex items-center gap-1" href="#">
+<span>Abrir visualizador completo</span>
+<span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+</a>
+</div>
+</div>
+<div class="space-y-space-xs">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded bg-surface-container-lowest hover:bg-surface-container transition-colors gap-2">
+<div class="flex items-start sm:items-center gap-space-md min-w-0">
+<span class="px-2 py-0.5 rounded font-mono-kbd text-[10px] bg-error-container/20 text-error font-medium uppercase tracking-wider flex-shrink-0">REVOKE_MEMBER</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary truncate">SuperAdmin removeu membro de Desenvolvimento</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant truncate">Autor: lucas@taskly.internal • Target: gustavo.souza@empresa.com • Motivo: Revogação imediata de credenciais de deploy</span>
+</div>
+</div>
+<div class="flex items-center gap-4 flex-shrink-0 self-end sm:self-center">
+<span class="font-mono-data text-[11px] text-outline">IP: 187.120.44.19</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Há 4 minutos</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded bg-surface-container-lowest hover:bg-surface-container transition-colors gap-2">
+<div class="flex items-start sm:items-center gap-space-md min-w-0">
+<span class="px-2 py-0.5 rounded font-mono-kbd text-[10px] bg-secondary-container/20 text-secondary-fixed font-medium uppercase tracking-wider flex-shrink-0">SECURITY_POLICY</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary truncate">Alteração de política de senha e exigência obrigatória de 2FA</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant truncate">Aplicação: Global Tenant • Regra: FIDO2/WebAuthn ou TOTP exigidos em até 48 horas para todos os administradores</span>
+</div>
+</div>
+<div class="flex items-center gap-4 flex-shrink-0 self-end sm:self-center">
+<span class="font-mono-data text-[11px] text-outline">IP: 187.120.44.19</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Hoje às 14:10</span>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded bg-surface-container-lowest hover:bg-surface-container transition-colors gap-2">
+<div class="flex items-start sm:items-center gap-space-md min-w-0">
+<span class="px-2 py-0.5 rounded font-mono-kbd text-[10px] bg-surface-container-high text-on-surface-variant font-medium uppercase tracking-wider flex-shrink-0">DATA_EXPORT</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-primary truncate">Exportação massiva de relatório financeiro e conciliação de faturamento</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant truncate">Autor: roberto@empresa.com • Formato: Encrypted JSON/CSV • Chave de auditoria: SHA256-e91b...34c</span>
+</div>
+</div>
+<div class="flex items-center gap-4 flex-shrink-0 self-end sm:self-center">
+<span class="font-mono-data text-[11px] text-outline">IP: 201.86.110.5</span>
+<span class="font-mono-data text-[11px] text-on-surface-variant">Ontem às 18:24</span>
+</div>
+</div>
+</div>
+</section>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-surface-container-lowest/80 backdrop-blur-sm hidden" id="invite-modal">
+<div class="relative w-full max-w-lg bg-surface-container rounded-xl p-space-xl shadow-2xl">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">person_add</span>
+<h3 class="font-headline-md text-headline-md text-primary tracking-tight">Convidar / Criar Novo Usuário</h3>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" id="btn-close-modal">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<form class="space-y-space-md" id="invite-form">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1">Nome Completo</label>
+<input class="w-full bg-surface-container-highest text-on-surface placeholder:text-outline font-body-md text-body-md px-3 py-2 rounded focus:outline-none focus:bg-surface-bright" placeholder="ex. Julia Guimarães" required="" type="text"/>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1">E-mail Corporativo</label>
+<input class="w-full bg-surface-container-highest text-on-surface placeholder:text-outline font-body-md text-body-md px-3 py-2 rounded focus:outline-none focus:bg-surface-bright" placeholder="nome@empresa.com" required="" type="email"/>
+</div>
+<div class="grid grid-cols-2 gap-space-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1">Função / Privilégio</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md px-3 py-2 rounded focus:outline-none focus:bg-surface-bright cursor-pointer">
+<option value="MEMBRO">Membro Padrão</option>
+<option value="WORKSPACE_ADMIN">Admin de Workspace</option>
+<option value="CONVIDADO">Convidado Temporário</option>
+<option value="SUPERADMIN">SuperAdmin (Privilegiado)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[18px] text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-1">Workspace Inicial</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-highest text-on-surface font-label-md text-label-md px-3 py-2 rounded focus:outline-none focus:bg-surface-bright cursor-pointer">
+<option value="desenvolvimento">Desenvolvimento</option>
+<option value="marketing">Marketing</option>
+<option value="website">Website</option>
+<option value="financeiro">Financeiro</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-2.5 text-[18px] text-outline pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div class="p-space-sm bg-surface-container-highest rounded text-on-surface-variant font-mono-data text-[11px] flex items-start gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary flex-shrink-0 mt-0.5">verified_user</span>
+<span>Um link seguro com expiração de 24 horas será enviado diretamente. O usuário precisará validar 2FA no primeiro login.</span>
+</div>
+<div class="flex items-center justify-end gap-space-sm pt-space-xs">
+<button class="px-4 py-2 rounded bg-surface-container-high text-on-surface font-label-md text-label-md hover:bg-surface-bright transition-colors" id="btn-cancel-modal" type="button">
+            Cancelar
+          </button>
+<button class="px-4 py-2 rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-fixed transition-colors shadow-md" type="submit">
+            Emitir Convite Corporativo
+          </button>
+</div>
+</form>
+</div>
+</div>
+<div class="fixed bottom-6 right-6 z-50 bg-surface-container-high text-primary font-mono-data text-mono-data px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 hidden" id="toast">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]">check_circle</span>
+<span id="toast-message">Operação executada com sucesso.</span>
+</div>
+</div>
+<script>
+  (function() {
+    const searchInput = document.getElementById('user-search');
+    const roleSelect = document.getElementById('role-filter');
+    const statusSelect = document.getElementById('status-filter');
+    const rows = document.querySelectorAll('.user-row');
+    const filteredCounter = document.getElementById('filtered-counter');
+    const modal = document.getElementById('invite-modal');
+    const btnOpen = document.getElementById('btn-open-modal');
+    const btnClose = document.getElementById('btn-close-modal');
+    const btnCancel = document.getElementById('btn-cancel-modal');
+    const inviteForm = document.getElementById('invite-form');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    const btnExport = document.getElementById('btn-export');
+    const btnLogs = document.getElementById('btn-logs-jump');
+
+    function filterTable() {
+      const q = (searchInput.value || '').toLowerCase().trim();
+      const r = roleSelect.value;
+      const s = statusSelect.value;
+      let count = 0;
+
+      rows.forEach(row => {
+        const name = (row.getAttribute('data-name') || '').toLowerCase();
+        const email = (row.getAttribute('data-email') || '').toLowerCase();
+        const role = row.getAttribute('data-role');
+        const status = row.getAttribute('data-status');
+
+        const matchQuery = !q || name.includes(q) || email.includes(q);
+        const matchRole = (r === 'ALL') || (role === r);
+        const matchStatus = (s === 'ALL') || (status === s);
+
+        if (matchQuery && matchRole && matchStatus) {
+          row.style.display = '';
+          count++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      filteredCounter.textContent = 'Mostrando ' + count + ' de 1.284 contas';
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    roleSelect.addEventListener('change', filterTable);
+    statusSelect.addEventListener('change', filterTable);
+
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3500);
+    }
+
+    btnOpen.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+    });
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      inviteForm.reset();
+    }
+
+    btnClose.addEventListener('click', closeModal);
+    btnCancel.addEventListener('click', closeModal);
+
+    inviteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      closeModal();
+      showToast('Convite administrativo despachado com sucesso.');
+    });
+
+    btnExport.addEventListener('click', () => {
+      showToast('Exportando auditoria em formato CSV consolidado...');
+    });
+
+    btnLogs.addEventListener('click', () => {
+      const el = document.getElementById('admin-audit-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  })();
+</script></main>
+</div>
+</body></html>

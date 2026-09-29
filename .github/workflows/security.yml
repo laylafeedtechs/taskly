@@ -1,0 +1,62 @@
+name: Build, tests & security checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '0 6 * * 1' # weekly dependency scan
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for secret scanning
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Fails on high/critical vulnerabilities in dependencies.
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      # Fails if secrets (keys, tokens, passwords) are found in the code or history.
+      - name: Secret scanning
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Guards the frontend bundle against leaked server-side secrets.
+      - name: Build
+        run: npm run build
+      - name: No secrets in the frontend bundle
+        run: |
+          if grep -rEl "GOOGLE_CLIENT_SECRET|SMTP_PASS|TASKLY_ENCRYPTION_KEY|tsk_live_[0-9a-f]{20,}|whsec_[0-9a-f]{20,}" dist; then
+            echo "Secret-like value found in dist/"; exit 1
+          fi
+
+      # Integration + security tests (auth, RBAC, tenant isolation, SSRF, CSRF, XSS, MFA, privacy).
+      - name: Tests
+        run: npm test
+
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v3

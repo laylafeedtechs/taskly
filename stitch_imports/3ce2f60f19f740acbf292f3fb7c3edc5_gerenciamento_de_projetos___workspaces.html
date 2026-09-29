@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    overscroll-behavior: none;
+  }
+  main > :first-child {
+    margin-top: 0 !important;
+  }
+  main > :last-child {
+    margin-bottom: 0 !important;
+  }
+}
+::-webkit-scrollbar {
+  display: none;
+}
+</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "inverse-surface": "#e5e2e1",
+        "inverse-on-surface": "#313030",
+        "error": "#ffb4ab",
+        "surface-container-high": "#2a2a2a",
+        "on-error-container": "#ffdad6",
+        "on-tertiary-fixed": "#002113",
+        "secondary-fixed-dim": "#adc6ff",
+        "tertiary-container": "#6ffbbe",
+        "on-surface-variant": "#c4c7c8",
+        "secondary-fixed": "#d8e2ff",
+        "on-tertiary-container": "#00734e",
+        "on-background": "#e5e2e1",
+        "secondary-container": "#0566d9",
+        "surface-tint": "#c6c6c7",
+        "surface-container-low": "#1c1b1b",
+        "on-secondary-container": "#e6ecff",
+        "on-primary-fixed": "#1a1c1c",
+        "on-primary-fixed-variant": "#454747",
+        "on-tertiary-fixed-variant": "#005236",
+        "surface-container-lowest": "#0e0e0e",
+        "primary-container": "#e2e2e2",
+        "primary-fixed": "#e2e2e2",
+        "primary-fixed-dim": "#c6c6c7",
+        "on-secondary-fixed-variant": "#004395",
+        "inverse-primary": "#5d5f5f",
+        "on-primary-container": "#636565",
+        "on-secondary-fixed": "#001a42",
+        "surface-bright": "#3a3939",
+        "on-tertiary": "#003824",
+        "surface-container": "#201f1f",
+        "on-error": "#690005",
+        "outline": "#8e9192",
+        "surface-container-highest": "#353534",
+        "on-surface": "#e5e2e1",
+        "tertiary-fixed-dim": "#4edea3",
+        "on-secondary": "#002e6a",
+        "primary": "#ffffff",
+        "on-primary": "#2f3131",
+        "secondary": "#adc6ff",
+        "background": "#131313",
+        "outline-variant": "#444748",
+        "tertiary": "#ffffff",
+        "error-container": "#93000a",
+        "surface-dim": "#131313",
+        "surface-variant": "#353534",
+        "surface": "#131313",
+        "tertiary-fixed": "#6ffbbe"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+      },
+      "spacing": {
+        "space-lg": "1rem",
+        "space-xs": "0.25rem",
+        "space-md": "0.75rem",
+        "space-xl": "1.5rem",
+        "space-sm": "0.5rem",
+        "margin-desktop": "2rem",
+        "margin": "1rem",
+        "gutter-desktop": "1.5rem",
+        "gutter": "1rem"
+      },
+      "fontFamily": {
+        "body-sm": ["Inter"],
+        "label-sm": ["Inter"],
+        "headline-xl": ["Inter"],
+        "headline-sm": ["Inter"],
+        "body-lg": ["Inter"],
+        "body-md": ["Inter"],
+        "label-md": ["Inter"],
+        "mono-kbd": ["JetBrains Mono"],
+        "headline-md": ["Inter"],
+        "headline-xl-mobile": ["Inter"],
+        "headline-lg": ["Inter"],
+        "mono-data": ["JetBrains Mono"]
+      },
+      "fontSize": {
+        "body-sm": ["12px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+        "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+        "headline-sm": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+        "body-lg": ["15px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+        "body-md": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "-0.005em", "fontWeight": "500" }],
+        "mono-kbd": ["10px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+        "headline-md": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+        "headline-xl-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+        "mono-data": ["12px", { "lineHeight": "18px", "letterSpacing": "-0.01em", "fontWeight": "400" }]
+      }
+    }
+  }
+};
+</script>
+</head>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased select-none">
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest border-r border-outline-variant/30 z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 overflow-y-auto px-space-md pt-space-lg gap-space-md">
+<div class="flex items-center justify-between px-space-sm pb-space-sm border-b border-outline-variant/20">
+<div class="flex items-center gap-space-sm min-w-0">
+<img alt="Taskly Brand Logo" class="h-7 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1XsA0-7F5FX4b_HEAnWccv8JjbVG5LQeRda76dAfhlYqQVDYwBoQCUja2jZFuvQlduKmMGdOKuPvvEvpynkr4fuX_uBAyIYCrk37iY58p4r-4GjfVFnDgKZWu7cJXphh-rqkzhPFd_AUx5b77ev5arZlRLXf1u3GiMNqkp3Y45aM05a4JAi767Gyh2RiYH4I4kVBrdknKjOCCShgDRXZLVua8KhdYOeEvx5vCBYDpBOFdl5BSsyKLBa69Lt"/>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-headline-sm text-primary truncate leading-none tracking-tight">Taskly</span>
+<div class="flex items-center gap-1 mt-1 cursor-pointer group">
+<span class="font-label-sm text-label-sm text-on-surface-variant group-hover:text-primary transition-colors truncate">Minha Empresa</span>
+<span class="material-symbols-outlined text-[13px] text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
+</div>
+</div>
+</div>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">unfold_more</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-xs">
+<button class="w-full flex items-center justify-between bg-primary text-on-primary font-label-md text-label-md py-1.5 px-3 rounded hover:bg-primary-fixed transition-colors shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Nova Tarefa</span>
+</div>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-lowest/20 text-on-primary border border-surface-container-lowest/30">C</kbd>
+</button>
+<button class="w-full flex items-center justify-between bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-label-md text-label-md py-1.5 px-3 rounded border border-outline-variant/30 transition-colors">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">search</span>
+<span class="font-body-sm text-body-sm">Buscar...</span>
+</div>
+<div class="flex items-center gap-0.5">
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">Ctrl</kbd>
+<kbd class="font-mono-kbd text-mono-kbd px-1 py-0.5 rounded bg-surface-container-high text-on-surface-variant border border-outline-variant/30">K</kbd>
+</div>
+</button>
+</div>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Navegação</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="dashboard" href="#">
+<span>Dashboard</span>
+</a>
+<a aria-current="page" class="flex items-center justify-between px-space-sm py-1.5 rounded transition-colors group bg-surface-container-high text-primary font-medium" data-path="projects" href="#">
+<span>Projetos</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="my-tasks" href="#">
+<span>Minhas tarefas</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="kanban" href="#">
+<span>Kanban</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="calendar" href="#">
+<span>Calendário</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="reports" href="#">
+<span>Relatórios</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="notifications" href="#">
+<span>Notificações</span>
+<span class="font-mono-data text-[11px] px-1.5 py-0.2 rounded bg-surface-container-high text-primary border border-outline-variant/40 font-medium">3</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 flex items-center justify-between">
+<span class="font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Workspaces</span>
+<button class="text-on-surface-variant hover:text-primary transition-colors" title="Adicionar Workspace">
+<span class="material-symbols-outlined text-[14px]">add</span>
+</button>
+</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-website" href="#">
+<span>Website</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-marketing" href="#">
+<span>Marketing</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-desenvolvimento" href="#">
+<span>Desenvolvimento</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" data-path="workspace-financeiro" href="#">
+<span>Financeiro</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-sm text-label-sm text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors border border-dashed border-outline-variant/30 mt-1" data-path="new-workspace" href="#">
+<span>+ Novo workspace</span>
+</a>
+</nav>
+<nav class="flex flex-col gap-0.5 pt-space-xs pb-space-md" data-active-classes="bg-surface-container-high text-primary font-medium">
+<div class="px-space-sm py-1 font-mono-kbd text-mono-kbd tracking-wider text-outline uppercase">Administração</div>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin" href="#">
+<span>Admin Panel</span>
+</a>
+<a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors group" data-path="admin-logs" href="#">
+<span>Logs de Auditoria</span>
+</a>
+</nav>
+</div>
+<div class="p-space-sm border-t border-outline-variant/30 bg-surface-container-lowest/80">
+<div class="flex items-center justify-between p-1.5 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative flex-shrink-0">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-tertiary-fixed-dim ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-medium truncate leading-none">Lucas Rocha</span>
+<span class="font-label-sm text-label-sm text-outline mt-0.5">Admin</span>
+</div>
+</div>
+<div class="flex items-center gap-0.5">
+<a class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors flex items-center justify-center" data-path="settings" href="#" title="Configurações">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</a>
+</div>
+</div>
+</div>
+</aside>
+<div class="pl-64">
+<header class="fixed top-0 left-64 right-0 h-14 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/20 z-40 flex items-center justify-between px-gutter-desktop">
+<div class="flex items-center gap-2">
+<div class="flex items-center text-on-surface-variant font-label-md text-label-md gap-1.5">
+<span class="hover:text-primary cursor-pointer transition-colors">Taskly</span>
+<span class="text-outline-variant">/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Minha Empresa</span>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-medium">Workspace</span>
+</div>
+<div class="ml-4 flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low border border-outline-variant/30 text-on-surface-variant font-mono-data text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span>Sincronizado</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<nav class="hidden lg:flex items-center gap-space-md text-label-md font-label-md" data-active-classes="text-primary font-medium">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="docs" href="#">Documentação</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="help" href="#">Ajuda</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" data-path="changelog" href="#">Changelog</a>
+</nav>
+<div class="h-4 w-px bg-outline-variant/40 hidden lg:block"></div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Filtros e Visualização">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Feedback">
+<span class="material-symbols-outlined text-[18px]">feedback</span>
+</button>
+<a class="block" data-path="settings" href="#" title="Perfil e Configurações">
+<img alt="Lucas Rocha Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline-variant/30 hover:ring-primary transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYD7KWf3dFibaTJhTmq76oh0XFizDPHvliSXBbZeD14bvyuFc3IyGUXQWqFgYp6SPGl2wiaOscmBV72VOw1qnk7X6gJK3BuD3E6diHIF_GKzjpjVUcFKg_6ErcF_Ub8cQ6BbU2N-qVytVKzLjm1t8N-X2EChyEyoI4uANDaN0_LlaCAy_cTUs0ijkxJDxQwY60wiSpezbyVEVJIRWAFUl3eS-xcpajrzpnkq7Ue4cmLuQNYRCg5rUU8A"/>
+</a>
+</div>
+</div>
+</header>
+<main class="relative pt-14 min-h-screen bg-surface-container-lowest w-full px-gutter-desktop py-space-xl"><div class="flex flex-col w-full">
+<!-- Top Headline & Action Deck -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg mb-space-xl">
+<div class="flex flex-col gap-1 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="font-mono-kbd text-mono-kbd tracking-wider uppercase text-outline">Organização / Hub</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-mono-data text-mono-data text-tertiary-fixed-dim">14 Projetos Operacionais</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-primary tracking-tight">Projetos &amp; Workspaces</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Gerencie e monitore todos os projetos ativos da sua organização em múltiplos workspaces.</p>
+</div>
+<!-- Primary Quick Actions -->
+<div class="flex items-center gap-space-sm flex-wrap">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-on-surface-variant">file_download</span>
+<span>Exportar</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-fixed transition-colors shadow-md">
+<span class="material-symbols-outlined text-[17px]">add</span>
+<span>Novo Projeto</span>
+<kbd class="ml-1 font-mono-kbd text-[10px] px-1 py-0.2 rounded bg-surface-container-lowest/20 text-on-primary">N</kbd>
+</button>
+</div>
+</div>
+<!-- Metric Badges / Micro Summary Deck -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md mb-space-xl">
+<!-- Metric 1 -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-md shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Total de Projetos</span>
+<span class="material-symbols-outlined text-outline text-[18px]">folder_copy</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-primary">14</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant">ativos</span>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<div class="h-1 flex-1 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary" style="width: 100%"></div>
+</div>
+<span class="font-mono-data text-[10px] text-outline">100% capacity</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-md shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Em Andamento</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">motion_photos_on</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-primary">9</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant">projetos</span>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<div class="h-1 flex-1 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary" style="width: 64%"></div>
+</div>
+<span class="font-mono-data text-[10px] text-secondary">64% do volume</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-md shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Em Revisão / Entrega</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]">fact_check</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-primary">3</span>
+<span class="font-mono-data text-mono-data text-on-surface-variant">sprints finais</span>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<div class="h-1 flex-1 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim" style="width: 21%"></div>
+</div>
+<span class="font-mono-data text-[10px] text-tertiary-fixed-dim">Próx. de conclusão</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-space-md shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Concluídos este mês</span>
+<span class="material-symbols-outlined text-outline text-[18px]">verified</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-primary">12</span>
+<span class="font-mono-data text-mono-data text-tertiary-fixed-dim">+4 vs mês ant.</span>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<div class="h-1 flex-1 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-surface-tint" style="width: 85%"></div>
+</div>
+<span class="font-mono-data text-[10px] text-outline">Meta superada</span>
+</div>
+</div>
+</div>
+<!-- Filtration & Layout Control Toolbar -->
+<div class="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md mb-space-lg bg-surface-container-low p-space-sm rounded-xl shadow-sm">
+<!-- Left: Search & Quick Filters -->
+<div class="flex flex-1 flex-wrap items-center gap-2">
+<!-- Search input -->
+<div class="relative flex-1 min-w-[240px] max-w-md">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[17px] text-outline">search</span>
+<input class="w-full h-[34px] pl-8 pr-12 rounded-lg bg-surface-container text-on-surface placeholder:text-outline text-body-md font-body-md focus:outline-none focus:bg-surface-container-high transition-colors" placeholder="Buscar projetos por nome, tag ou líder... (Ctrl+F)" type="text"/>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
+<kbd class="font-mono-kbd text-[10px] px-1 py-0.5 rounded bg-surface-container-highest text-outline">Ctrl</kbd>
+<kbd class="font-mono-kbd text-[10px] px-1 py-0.5 rounded bg-surface-container-highest text-outline">F</kbd>
+</div>
+</div>
+<!-- Workspace Select Pills -->
+<div class="flex items-center gap-1 overflow-x-auto py-0.5">
+<button class="px-2.5 py-1 rounded text-label-sm font-label-sm bg-surface-container-high text-primary font-medium">Todos</button>
+<button class="px-2.5 py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Website</button>
+<button class="px-2.5 py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Marketing</button>
+<button class="px-2.5 py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Desenvolvimento</button>
+<button class="px-2.5 py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">Financeiro</button>
+</div>
+</div>
+<!-- Right: Status Dropdown & View Mode Switcher -->
+<div class="flex items-center gap-2 self-end xl:self-auto">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container text-on-surface-variant text-label-sm font-label-sm cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>Status: <strong>Ativos</strong></span>
+<span class="material-symbols-outlined text-[15px] ml-0.5">expand_more</span>
+</div>
+<div class="h-4 w-px bg-surface-container-highest mx-0.5"></div>
+<!-- Grid vs Table view toggle -->
+<div class="flex items-center bg-surface-container p-0.5 rounded">
+<button class="p-1 rounded bg-surface-container-high text-primary shadow-sm" title="Grade de Cards">
+<span class="material-symbols-outlined text-[17px]">grid_view</span>
+</button>
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Visualização em Lista/Tabela">
+<span class="material-symbols-outlined text-[17px]">table_rows</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Projects Grid Matrix (Linear/Vercel Aesthetic) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">
+<!-- CARD 1: Website Institucional -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<!-- Card Top Bar: Workspace & Status -->
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Desenvolvimento</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-secondary/15 text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+              Ativo • Sprint 04
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Project Title & Lead -->
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-secondary-fixed transition-colors">
+          Website Institucional &amp; Plataforma
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Corporate headshot of tech lead Lucas Rocha in dark aesthetic studio with subtle rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOS9x2NmHJ2AnqvCgLmRI6S6ylgKp2qLhXhHhOHITTK5CsqgGsT98KoEWPVukgZwEKE5C1kJswtog6hyinmzFFLyS-Hu-K4y-VuDR9vkd9BNHKb4woPWqkdT2DykDL5T0wTKq0GUDMtVnvgbxM8MBHqySedOXlQFIIKNFdHtD-clqRcPYRL6cfI569gjafdlvcBEvI_0xJJp3WMkoau8xUY1LxyDfjbxzjghJ_M1MYVTnABm_yg3iKrQ"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Lucas Rocha</span></span>
+</div>
+<!-- Progress Gauge -->
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">38/46 tarefas concluídas</span>
+<span class="text-primary font-medium">82%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<!-- Metric Details -->
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span>
+<span>18 de Maio</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">speed</span>
+<span>42 pts / sprint</span>
+</div>
+</div>
+</div>
+<!-- Footer: Tags & Stacked Team Avatars -->
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#DesignSystem</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#React</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Tailwind</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of software engineer team member smiling subtly against dark gradient backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn2a2v6_sO0bBaQE6nbkwv1IZ3l1Vc4DCX2xK7IK5nb5pTuTkp05Ww1k5fmpknfxExlp0AniXWExXmsQa5UUtKG0S96D_iQ4-uNEBrXNYDWPcKppmo-W-bVthOYMtaRDDJNF5qe9Z4Hicq5tNpNDh_Ff7iSj0TrDjngFC0IU-RPLvjnd5_pIqUvS9N3sVw4AKddUhmRHHyFhYcGcPoOcWB_V8xPKWtCi3WNXUuwMEegJuClbtS8UOysw"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of UI UX product designer in minimal dark workspace looking at screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOYHzvrqEsR1jvouPcUoiNw_leNLQPKR4U0oxPPPBJNhZ6pwBfhC8X-8Tna3N8muUP8L8vTLuV9a1nuRwt7Qq1DJLy8XUqwJo66-1hic9Rr2_LxgriV807bB0M7ZO0d8SIoViRgS9KqTvQiAgkDKI2uoNlzfR9bZap1VAjbO5OzJpMJz76u_Kbn0edQ221p6FVf4IiBiAe_HE4D4pIjK_VR3FMoFwZHddedoiElp_Vmh5AbYUW1ePqNg"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of front end web developer with glasses in sleek modern studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9oLciZSTFeKH3vo1ZbL2GWYEXUhtPNz3KKfzJHDAHdbSnMSBtr7CDx0qY_LZ1vucJapwbcefzTgbq6NtSizC6sMx86dtlN91uVsjeJYoH2qq_qlyIPzebyTG41r_LQbhV2GaVE0KA3xF7_rwWJjffpJJytzBG6ARN1y2iGPd0XClCzUJoY-sB-v0Zv5_V3bgheaMMjb7_T5NwQ5vMFY8mG1jslMxwuCEv0yFNd1RZkxbEN1mkhBT6PA"/>
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-primary font-mono-kbd text-[10px] flex items-center justify-center font-medium">+2</span>
+</div>
+</div>
+</div>
+<!-- CARD 2: Marketing Growth -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Marketing</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-tertiary-container/20 text-on-tertiary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+              Ativo • Em execução
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-primary-fixed transition-colors">
+          Marketing Growth &amp; Campanhas Q4
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Portrait of female growth marketing director Fernanda Lins in contemporary dark mood studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7ycNYyWHTUI7GW3S54FTp8U9qojhGmGSfw8yHpIZsIXC-Gri6faCq0vqT-E6qjCjv7BKLGV8fuTvu8M0rU73g80dzp9trvbPMK2OBtfzcJndXxXLy5uBu4F48DHLY10Jrs71vOvnjG9rfDY96S7zK_KUuzrlekdD0K_UQ-_JPCfkSEwNR-HcHRr1FDsQzuHCR4Yo5iTyUXl9HmSiamAelVTDB2JqoJe1ySzay_UFj-LUJUun8Fu1Ehw"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Fernanda Lins</span></span>
+</div>
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">25/39 tarefas concluídas</span>
+<span class="text-primary font-medium">64%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-tertiary-fixed-dim rounded-full" style="width: 64%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span>
+<span>28 de Maio</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">group</span>
+<span>4 membros alocados</span>
+</div>
+</div>
+</div>
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#SEO</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Copy</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Ads</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of marketing strategist in sleek dark atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChJI-yNYpPHaLlioRuDBOBne7zZffPBa2MP_aPFJeW-zs1UWUfCc1HtjGE1FxyH6NMF2bwRjJNn1yBw8SX4PvmwP-0jkojUWhPpsBLGSf_GIstfHwFHkRbvbDdh84XC_fu08IVPnoCXQF-mZ8ybY5tvLfou-gCyflt1V8WBP3CGdFwKnsk1vF2SBnOutT6-C7fwQJEZDB_S6i-2nFgGY9kzSDuyW0iNlYDWasmTtz8GYnznZaoHJbmfQ"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of content specialist female creative professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_hQOLMk4v55YZnu36oYLb2EY4qGdymZO1sinnq6L2e4MhpQett8RAhrdZDi-YkjVLwbmJDF-Jjgsw2xf1Q7RzwCsyfdKGyLbK0WfRJ3abvr9CCWUjCwlKRr7yMjqQSxXd27decMLTnnO8wGLDcxO6NY-QbSrRFRQ0L6FW6PEGIrMBEt86B8rxQzKsSCCOHp2JbXzFeWzAq89lApiP5Xfb3-4eCBL3xjrHQV6TcC4wKMPyOV8p_V_7GA"/>
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-primary font-mono-kbd text-[10px] flex items-center justify-center font-medium">+2</span>
+</div>
+</div>
+</div>
+<!-- CARD 3: API Gateway v2 -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Desenvolvimento</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-surface-container-high text-primary font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+              Em Revisão Técnica
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-secondary-fixed transition-colors">
+          API Gateway v2 &amp; Microserviços
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Portrait of senior backend architect Carlos Eduardo in tech setting with ambient dark slate background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4XS_Sle3LLZnzGh5Uz_qLxkXaGKWxa-V-idXuJLWTWODftS15POf4myZuVTtC_BzlVDJB1LupPraBBfLS3bsXvz-w57gWdMh3WEttIfQGa4xlzMGn6gFJlysxqTTREjynxQd87xCCMRz2Tyco8boYaPZzRexjN51nuEumMARIOFgJcjF9PjmlsXVLf1LBf4YluvFhaAxSCZNFEPOpM5dgPcGI3lEzUGBuzRp82531twMZEfD_cImb_w"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Carlos Eduardo</span></span>
+</div>
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">42/46 tarefas concluídas</span>
+<span class="text-primary font-medium">91%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 91%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span>
+<span>12 de Junho</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">cloud_sync</span>
+<span>99.98% SLA</span>
+</div>
+</div>
+</div>
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Go</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#gRPC</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#K8s</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of cloud backend engineer in minimal dark frame" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkQ1CsaCoIX0-CByWetkcJkbqkxBjDPHo4H2QoUyEwhkHsAV-j3QZ9uXnppbr3jfY1ZNEfTwyh_w4p8WzZjW6qI-gEjJhH2wR_9_ArbImt3TQCJMjXXdH8DqEeG2syWtFf7bcldxO3YGfOBipmQhCjabtPuRE3MUSBGMmszYoj-Un9xE68XR0zwNKSqTPBwBuuwBdCY8SODQcIO-O5kK3qX_oo87ix-7KOsZ0B0F9i_W99EfvHHHTJJQ"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of devops engineer with headphones in night dark office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXMgk372hgyvtTO8o5A0Q_0JuewJVi5FQL21swPA67fuBfKltqTnMgsqi_1l-O6QRrmIqT99iS5qlQB0bLMJ1q5c7vucwEElK8af9erZ0wnDbkQ7IpIb--luACk3Qv9kwVECpa1-XGsqo2bvRYRAM1bpF0SuDqS43kdzq2U0s2m_1jc4CTVaWbUmFmA5-wmz53AT6PDHxmpEe4-g_3jxr_Qc42xsHUBBzOjCm0czq68pzavKu1bTiXuw"/>
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-primary font-mono-kbd text-[10px] flex items-center justify-center font-medium">+1</span>
+</div>
+</div>
+</div>
+<!-- CARD 4: Auditoria Financeira Q2 -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Financeiro</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-error-container/40 text-error">
+<span class="material-symbols-outlined text-[12px]">warning</span>
+              Atenção • Prazo Próximo
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-error transition-colors">
+          Auditoria &amp; Fechamento Financeiro Q2
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Portrait of financial director Roberto Paiva in suit against neutral dark graphite backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBus7xOvICC9zTFiIaACeU4_Ks5qpNN7GdWToYDmw7MhzruozyGMP39TUTRG_XqC38_F5biTj6qwKiy26XhIY6etun4AJhPtzpWoGmHhrRickqagv4m0ZVii4n2k7HzC2kx6REfJh-2qXeueQa-yX1Ol_qgusa_AYh0lMFzJNcNPLiFtjo9YaImr15iHBP-WBuH0a0re4avsMs2HGpu6yLIXRri_dKfVYAAC7ddS-2p2O3pvl8P3a91JA"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Roberto Paiva</span></span>
+</div>
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">14/40 tarefas concluídas</span>
+<span class="text-error font-medium">35%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-error rounded-full" style="width: 35%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-error mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">event_busy</span>
+<span>22 de Maio (3 dias)</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">checklist</span>
+<span>26 pendências</span>
+</div>
+</div>
+</div>
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Compliance</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Fiscal</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of compliance auditor specialist in sleek dark office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0pgOummKFtKVxHSjCB9KqLphIrAUBv2uI6epNQU-lohy2kloqpCjKVd0Y7UbqA427Wl932rsZmWu1vT8EfAeb3mOGG3N5GbDyVPihwLIx_SzPYlnazjBFV7q2uAbcfvVgtpEoNIGcOU6NG7tKLE1Zbcjan421tWul0blBNNmzDXoB2qCxXXiEojNY9eED8WZSpj3TVxcTdEBJeUYniKaB6m1eJykFfFC3ebzqPTABpFaRRsKJEDb4Ug"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of accountant professional in monochrome studio portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCte3szgbVc-pvDx2XYhaxC09TwFHYhpEcmhKLTuAuizpOvFkfGMH9oQQOu-JyP9gHmxt39iVOADdGpLbbEBjhCXvz89XnKsBctqjn8dGLBzWkTCZcSZa0fCVBsMHC1OF3uZHAIOcxyJNJODTI1rqbnnPRdLYWHPoI7oyBjFariCiBokwRBAd0JK0ycs07qfhVO5ayE_GrJshh1pshe6I023FIC4CzPT7Z9sYh9QAnpzZFEO4cqTDRa4g"/>
+<span class="w-6 h-6 rounded-full bg-surface-container-highest text-primary font-mono-kbd text-[10px] flex items-center justify-center font-medium">+1</span>
+</div>
+</div>
+</div>
+<!-- CARD 5: Redesign do Portal de Carreiras -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-on-surface-variant"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Website</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-surface-container-high text-on-surface-variant">
+              Iniciação
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-primary-fixed transition-colors">
+          Redesign do Portal de Carreiras
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Portrait of senior product designer Mariana Silva in high contrast dark studio portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzUjKezQIqxJz8ChCk0mIbs99u5DU4ElwpUPwO7mYKqBOwTNIPr5lslbwGEwRCi268OUq8kF6AJtjFClhvFV-hlwbK22gdh3EVi7AK0VHn0faqoGk3uR61PD0HP0zyU9oNSMpXzvgDj3R4DNd7rOl7-c6uq082ef_O5FdgNfIcd3xc_ywIZccTwjQpPSnYIMePWzFQ0VyYbvcWXcN7OQnDd8E58vvI9Zstyemnn_wzvJGV0NsQU4Ah3A"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Mariana Silva</span></span>
+</div>
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">3/20 tarefas concluídas</span>
+<span class="text-primary font-medium">15%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-on-surface-variant rounded-full" style="width: 15%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span>
+<span>15 de Julho</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">brush</span>
+<span>Discovery</span>
+</div>
+</div>
+</div>
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Figma</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Branding</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of creative copywriter in dark minimalist frame" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvS_O1JpbgyGn1HOBbJ8SAPIdOgijKQjOk9ncoHSqBXMurBKmvPKV-367Ctj5YRrd7t4WDcCJQxNrY0tcNvgnH_LfLWMxlV00V84KnbrBsh53SzKGVo6q0OC_3xwxWsmV6xsRHrxKLAV0ZkI9O7wIE261dymVTyrjF0oJvZU1lnUIe9nq341zqPooYivjCQ2Q3N1eE_ERm01SxRO0yWSd2ilvL-twiNRegJ479kGtOiZDdaUI2ZFDzTg"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of visual designer with soft moody backlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2tra1cI4QwwHS-sY5MjD_wqkCA-AA7d9o3UvbnHySkxRIuJO8IGdKtVajBRXRI5RxmkFerirqos6x2utc3JtCfXFB0a9F7PrK2bK9QGlueAq4Oj7AMV7V1vQJIhrGLcwN0AVuIUrgIveq0YyCGUVAeAabiYB4tUUtZqtuos-7rw_4Pi96AIXfMBrNALxsDusD8O9DlvJ86uS1G3E9qGuCsIfbuCPHMqTmHEF8dQpqflZcQwepOarZoA"/>
+</div>
+</div>
+</div>
+<!-- CARD 6: Automação Fiscal & ERP -->
+<div class="group relative flex flex-col justify-between rounded-xl bg-surface-container-low p-space-lg shadow-sm hover:bg-surface-container hover:-translate-y-0.5 transition-all">
+<div class="flex flex-col">
+<div class="flex items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-mono-kbd text-mono-kbd uppercase tracking-wider text-outline">Financeiro</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono-data bg-surface-container-high text-primary">
+              Em Andamento
+            </span>
+<button class="p-1 text-outline hover:text-primary rounded hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[17px]">more_horiz</span>
+</button>
+</div>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-primary tracking-tight group-hover:text-primary-fixed transition-colors">
+          Automação Fiscal &amp; Integração ERP
+        </h2>
+<div class="flex items-center gap-2 mt-1 mb-4">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="Lucas Rocha product manager portrait in dark moody tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf97TKEdIM9SMxV9lz7VJj0A9jA044hm0oUZNNqBFJc7PR1P_GMjKqnbD7Wvw4lZtMwKgw5oYTKHzbzgzgagVw-mEXyiw1rdUhDrukEqN3PAL6l3NJfkpGT7dDt0MISEKeoSASs3vlyydH5p6_Om4MkLXjiXIx2X7oA__cyt5lJHVOXy2KjGKuitBC4usjS9bKqObIWnP5r9qtxkl15W-zCInGGRShUG8XjXuuHUxXXyYPrHaLDZ6aFw"/>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Líder: <span class="text-on-surface">Lucas Rocha</span></span>
+</div>
+<div class="flex flex-col gap-1.5 mb-4">
+<div class="flex items-center justify-between text-mono-data font-mono-data text-[11px]">
+<span class="text-on-surface-variant">12/25 tarefas concluídas</span>
+<span class="text-primary font-medium">48%</span>
+</div>
+<div class="h-1.5 w-full rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full" style="width: 48%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 py-2 px-2.5 rounded bg-surface-container text-mono-data font-mono-data text-[11px] text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span>
+<span>30 de Junho</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-outline">sync_alt</span>
+<span>SAP Connector</span>
+</div>
+</div>
+</div>
+<div class="pt-3 flex items-center justify-between">
+<div class="flex flex-wrap gap-1">
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#SAP</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#Python</span>
+<span class="font-mono-kbd text-[10px] px-1.5 py-0.5 rounded bg-surface-container-high text-outline">#SQL</span>
+</div>
+<div class="flex items-center -space-x-1.5">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of software engineer developer looking straight at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJKb9GmFxZL_QXddkVhFdY4AW4fqxOCmgNugKmuYLZdyevQ7XDK1lCkB5r6TEqdNS37un984GV_KLcnuPHA9N8jx13bsNblG4hITP5WKJCfya3eHi4Qp7OqON_4KFKefynRIprew8Fv1P_3Q_b7GXYQ2AvEkm0N4sjUdDbqXUyzmozkAmvEcdpxApe7X4SCpz2aMWFVbTDtcxyXDmzPcf0uow0OuQ8-ylm-1SBLE1SpKOlESyhoxpJIw"/>
+<img class="w-6 h-6 rounded-full object-cover" data-alt="Headshot of data analyst woman with confident calm expression in dark environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk7hoIC3X7GLvUecv7-oy7sj6xUETRshox_GxUR-A8sY0orxZ8yUFoJ_9kN4TCkCwnDbjXGZD9jZ-lKsB3yLvuYVQY8MuSV3Rb_p2BnIbYTGAuJC2LBuVVFOSFjdn9bU6EDhPCwXVgzespgdjrbCxNMBYgTSSQgGQew5L0H1GaGnxjllF_BE9cG2Lc9GSViZJ05P_4HoK1579Mx5DC5dhCs5kusOl8FfbUP9BvwzZzPMHhRafykUf_JQ"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Workspace Capacity & Pagination Bar -->
+<div class="mt-space-xl pt-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md bg-surface-container-low px-space-lg py-3 rounded-xl shadow-sm">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-mono-data text-mono-data text-on-surface-variant">Exibindo <strong class="text-primary font-medium">6 de 14</strong> projetos ativos</span>
+</div>
+<span class="text-surface-container-highest">•</span>
+<span class="font-mono-data text-[11px] text-outline">Sincronizado há 2 min</span>
+</div>
+<!-- Pagination Controls -->
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center w-8 h-8 rounded bg-surface-container text-outline opacity-40 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 rounded bg-surface-container-high text-primary font-mono-data text-mono-data font-medium">1</button>
+<button class="w-7 h-7 rounded text-on-surface-variant hover:bg-surface-container font-mono-data text-mono-data transition-colors">2</button>
+<button class="w-7 h-7 rounded text-on-surface-variant hover:bg-surface-container font-mono-data text-mono-data transition-colors">3</button>
+</div>
+<button class="flex items-center justify-center w-8 h-8 rounded bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div></main>
+</div>
+</body></html>

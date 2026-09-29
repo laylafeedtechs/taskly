@@ -1,0 +1,169 @@
+[
+  {
+    "id": "234bc7620f9d4e3eb0bf661c322e3f74",
+    "title": "High-end professional developer portrait avatar, subtle neutral dark studio lighting, sleek monochrome minimalist tech headshot, crisp and elegant",
+    "screenName": "projects/18150988002736060321/screens/234bc7620f9d4e3eb0bf661c322e3f74",
+    "width": "1024",
+    "height": "1024",
+    "screenshotFile": "234bc7620f9d4e3eb0bf661c322e3f74_screenshot.webp"
+  },
+  {
+    "id": "ee9c2599a104471abb4cf18a6e6b1add",
+    "title": "Automações & Workflows",
+    "screenName": "projects/18150988002736060321/screens/ee9c2599a104471abb4cf18a6e6b1add",
+    "width": "2560",
+    "height": "2240",
+    "deviceType": "DESKTOP",
+    "codeFile": "ee9c2599a104471abb4cf18a6e6b1add_automa__es___workflows.html",
+    "screenshotFile": "ee9c2599a104471abb4cf18a6e6b1add_screenshot.webp"
+  },
+  {
+    "id": "4af183ef4c3a49e8b81369323bd89c1d",
+    "title": "Configurações da Conta & Perfil",
+    "screenName": "projects/18150988002736060321/screens/4af183ef4c3a49e8b81369323bd89c1d",
+    "width": "2560",
+    "height": "4636",
+    "deviceType": "DESKTOP",
+    "codeFile": "4af183ef4c3a49e8b81369323bd89c1d_configura__es_da_conta___perfil.html",
+    "screenshotFile": "4af183ef4c3a49e8b81369323bd89c1d_screenshot.webp"
+  },
+  {
+    "id": "3acca665367a4d3c8eda9efa1f100eb5",
+    "title": "Logs de Auditoria & Segurança",
+    "screenName": "projects/18150988002736060321/screens/3acca665367a4d3c8eda9efa1f100eb5",
+    "width": "2560",
+    "height": "3108",
+    "deviceType": "DESKTOP",
+    "codeFile": "3acca665367a4d3c8eda9efa1f100eb5_logs_de_auditoria___seguran_a.html",
+    "screenshotFile": "3acca665367a4d3c8eda9efa1f100eb5_screenshot.webp"
+  },
+  {
+    "id": "a5b3727893ac455e92fe4d0eda1c9145",
+    "title": "Kanban & Detalhes da Tarefa",
+    "screenName": "projects/18150988002736060321/screens/a5b3727893ac455e92fe4d0eda1c9145",
+    "width": "2560",
+    "height": "2468",
+    "deviceType": "DESKTOP",
+    "codeFile": "a5b3727893ac455e92fe4d0eda1c9145_kanban___detalhes_da_tarefa.html",
+    "screenshotFile": "a5b3727893ac455e92fe4d0eda1c9145_screenshot.webp"
+  },
+  {
+    "id": "f89dd08010894186aa2453da80844b58",
+    "title": "Relatórios & Analytics (BI)",
+    "screenName": "projects/18150988002736060321/screens/f89dd08010894186aa2453da80844b58",
+    "width": "2560",
+    "height": "3536",
+    "deviceType": "DESKTOP",
+    "codeFile": "f89dd08010894186aa2453da80844b58_relat_rios___analytics__bi_.html",
+    "screenshotFile": "f89dd08010894186aa2453da80844b58_screenshot.webp"
+  },
+  {
+    "id": "1f0706fffcf5475abaea5733ffb00fb1",
+    "title": "Kanban Avançado & Detalhes da Tarefa",
+    "screenName": "projects/18150988002736060321/screens/1f0706fffcf5475abaea5733ffb00fb1",
+    "width": "2560",
+    "height": "2514",
+    "deviceType": "DESKTOP",
+    "codeFile": "1f0706fffcf5475abaea5733ffb00fb1_kanban_avan_ado___detalhes_da_tarefa.html",
+    "screenshotFile": "1f0706fffcf5475abaea5733ffb00fb1_screenshot.webp"
+  },
+  {
+    "id": "3ce2f60f19f740acbf292f3fb7c3edc5",
+    "title": "Gerenciamento de Projetos & Workspaces",
+    "screenName": "projects/18150988002736060321/screens/3ce2f60f19f740acbf292f3fb7c3edc5",
+    "width": "2560",
+    "height": "2146",
+    "deviceType": "DESKTOP",
+    "codeFile": "3ce2f60f19f740acbf292f3fb7c3edc5_gerenciamento_de_projetos___workspaces.html",
+    "screenshotFile": "3ce2f60f19f740acbf292f3fb7c3edc5_screenshot.webp"
+  },
+  {
+    "id": "6a6124eed83d48058203319aa567728c",
+    "title": "Minhas Tarefas",
+    "screenName": "projects/18150988002736060321/screens/6a6124eed83d48058203319aa567728c",
+    "width": "2560",
+    "height": "2228",
+    "deviceType": "DESKTOP",
+    "codeFile": "6a6124eed83d48058203319aa567728c_minhas_tarefas.html",
+    "screenshotFile": "6a6124eed83d48058203319aa567728c_screenshot.webp"
+  },
+  {
+    "id": "f7345ca487bd401091da6ba9d6341aa1",
+    "title": "Painel de Administração Global",
+    "screenName": "projects/18150988002736060321/screens/f7345ca487bd401091da6ba9d6341aa1",
+    "width": "2560",
+    "height": "2800",
+    "deviceType": "DESKTOP",
+    "codeFile": "f7345ca487bd401091da6ba9d6341aa1_painel_de_administra__o_global.html",
+    "screenshotFile": "f7345ca487bd401091da6ba9d6341aa1_screenshot.webp"
+  },
+  {
+    "id": "a5340ef21c234737b11edf08cf320910",
+    "title": "Projetos & Iniciativas",
+    "screenName": "projects/18150988002736060321/screens/a5340ef21c234737b11edf08cf320910",
+    "width": "2560",
+    "height": "2446",
+    "deviceType": "DESKTOP",
+    "codeFile": "a5340ef21c234737b11edf08cf320910_projetos___iniciativas.html",
+    "screenshotFile": "a5340ef21c234737b11edf08cf320910_screenshot.webp"
+  },
+  {
+    "id": "e29bbc9f6697480f9b447e4e63ff80da",
+    "title": "Gestão de Membros & Permissões",
+    "screenName": "projects/18150988002736060321/screens/e29bbc9f6697480f9b447e4e63ff80da",
+    "width": "2560",
+    "height": "3682",
+    "deviceType": "DESKTOP",
+    "codeFile": "e29bbc9f6697480f9b447e4e63ff80da_gest_o_de_membros___permiss_es.html",
+    "screenshotFile": "e29bbc9f6697480f9b447e4e63ff80da_screenshot.webp"
+  },
+  {
+    "id": "0f846e21fd9e49d4ba285c02d1214012",
+    "title": "Calendário de Prazos & Entregas",
+    "screenName": "projects/18150988002736060321/screens/0f846e21fd9e49d4ba285c02d1214012",
+    "width": "2560",
+    "height": "2048",
+    "deviceType": "DESKTOP",
+    "codeFile": "0f846e21fd9e49d4ba285c02d1214012_calend_rio_de_prazos___entregas.html",
+    "screenshotFile": "0f846e21fd9e49d4ba285c02d1214012_screenshot.webp"
+  },
+  {
+    "id": "428eef88ae6142dc8a2f2f7bfbed94c6",
+    "title": "Central de Notificações & Atividades",
+    "screenName": "projects/18150988002736060321/screens/428eef88ae6142dc8a2f2f7bfbed94c6",
+    "width": "2560",
+    "height": "2506",
+    "deviceType": "DESKTOP",
+    "codeFile": "428eef88ae6142dc8a2f2f7bfbed94c6_central_de_notifica__es___atividades.html",
+    "screenshotFile": "428eef88ae6142dc8a2f2f7bfbed94c6_screenshot.webp"
+  },
+  {
+    "id": "2686ea6990f94ad0a04cce957e9e0215",
+    "title": "Dashboard - Produtividade & Visão Geral",
+    "screenName": "projects/18150988002736060321/screens/2686ea6990f94ad0a04cce957e9e0215",
+    "width": "2560",
+    "height": "2116",
+    "deviceType": "DESKTOP",
+    "codeFile": "2686ea6990f94ad0a04cce957e9e0215_dashboard_-_produtividade___vis_o_geral.html",
+    "screenshotFile": "2686ea6990f94ad0a04cce957e9e0215_screenshot.webp"
+  },
+  {
+    "id": "41b88bd453a040c183b355606bc65f69",
+    "title": "Taskly Brand Logo",
+    "screenName": "projects/18150988002736060321/screens/41b88bd453a040c183b355606bc65f69",
+    "width": "40",
+    "height": "40",
+    "codeFile": "41b88bd453a040c183b355606bc65f69_taskly_brand_logo.svg",
+    "screenshotFile": "41b88bd453a040c183b355606bc65f69_screenshot.webp"
+  },
+  {
+    "id": "4329d147c0d947fdafb8b99b0138b242",
+    "title": "Dashboard Operacional",
+    "screenName": "projects/18150988002736060321/screens/4329d147c0d947fdafb8b99b0138b242",
+    "width": "2560",
+    "height": "2360",
+    "deviceType": "DESKTOP",
+    "codeFile": "4329d147c0d947fdafb8b99b0138b242_dashboard_operacional.html",
+    "screenshotFile": "4329d147c0d947fdafb8b99b0138b242_screenshot.webp"
+  }
+]

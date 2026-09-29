@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens as RGB channels (see tailwind.config.js). Dark is the default identity. */
+:root,
+:root[data-theme='dark'] {
+  --bg: 8 8 8;              /* #080808 */
+  --bg-secondary: 13 13 13; /* #0D0D0D */
+  --surface: 17 17 17;      /* #111111 */
+  --surface-card: 22 22 22; /* #161616 */
+  --surface-elevated: 28 28 28; /* #1C1C1C */
+  --surface-hover: 34 34 34;
+  --border: 41 41 41;       /* #292929 */
+  --border-subtle: 31 31 31;
+  --border-focus: 68 68 68;
+  --text-primary: 245 245 245; /* #F5F5F5 */
+  --text-secondary: 160 160 160; /* #A0A0A0 */
+  --text-muted: 118 118 118;  /* #666 lifted slightly for WCAG AA on #080808 */
+  --inverse: 245 245 245;
+  --inverse-text: 8 8 8;
+  --shadow: 0 0 0;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: 250 250 250;
+  --bg-secondary: 244 244 245;
+  --surface: 255 255 255;
+  --surface-card: 255 255 255;
+  --surface-elevated: 244 244 245;
+  --surface-hover: 235 235 237;
+  --border: 222 222 226;
+  --border-subtle: 232 232 235;
+  --border-focus: 170 170 178;
+  --text-primary: 17 17 19;
+  --text-secondary: 82 82 91;
+  --text-muted: 113 113 122;
+  --inverse: 17 17 19;
+  --inverse-text: 250 250 250;
+  --shadow: 24 24 27;
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--border));
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(var(--bg));
+    color: rgb(var(--text-primary));
+    font-family: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  .font-tabular { font-feature-settings: "tnum" 1, "cv05" 1, "cv11" 1; }
+
+  /* Visible keyboard focus everywhere, invisible for mouse users. */
+  :focus-visible {
+    outline: 2px solid rgb(59 130 246);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button:focus:not(:focus-visible) { outline: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--border-focus)); }
+* { scrollbar-width: thin; scrollbar-color: rgb(var(--border)) transparent; }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Only the Kanban area scrolls horizontally; columns never shrink. */
+.kanban-scroll { overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; }
+.kanban-column { flex: 0 0 300px; min-width: 280px; max-width: 340px; }
+
+.card-hover { transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease; }
+.card-hover:hover { border-color: rgb(var(--border-focus)); box-shadow: 0 6px 20px rgb(var(--shadow) / 0.25); }
+
+.skeleton {
+  background: linear-gradient(90deg, rgb(var(--surface-card)) 0%, rgb(var(--surface-hover)) 50%, rgb(var(--surface-card)) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 6px;
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+@media print {
+  aside, header, .no-print { display: none !important; }
+  main { padding: 0 !important; }
+}
