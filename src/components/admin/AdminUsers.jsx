@@ -3,19 +3,19 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
 import { useAsync, useDebounce } from '../../lib/hooks';
 import { formatDateTime, timeAgo } from '../../lib/format';
-import { Alert, AsyncBoundary, Avatar, Btn, Checkbox, EmptyState, Field, Input, Modal, Pagination, Pill, SearchInput, Segmented } from '../ui';
+import { Alert, AsyncBoundary, Avatar, Btn, EmptyState, Field, Input, Modal, Pagination, Pill, SearchInput, Segmented, Textarea } from '../ui';
 import { CopyField, RowMenu, TableWrap, Td, Th, errorText } from '../settings/common';
 
 const STATUS_OPTIONS = [{ value: 'ALL', label: 'Todos' }, { value: 'ACTIVE', label: 'Ativos' }, { value: 'BLOCKED', label: 'Bloqueados' }];
 
 function UserModal({ open, target, onClose, onSaved }) {
-  const [form, setForm] = useState({ name: '', email: '', password: '', isSuperAdmin: false });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!open) return;
-    setForm({ name: target?.name || '', email: target?.email || '', password: '', isSuperAdmin: Boolean(target?.isSuperAdmin) });
+    setForm({ name: target?.name || '', email: target?.email || '', password: '' });
     setError(null);
   }, [open, target]);
 
@@ -24,7 +24,7 @@ function UserModal({ open, target, onClose, onSaved }) {
     e.preventDefault();
     setSaving(true); setError(null);
     try {
-      const body = { name: form.name.trim(), email: form.email.trim(), isSuperAdmin: form.isSuperAdmin };
+      const body = { name: form.name.trim(), email: form.email.trim() };
       const res = target
         ? await api.admin.updateUser(target.id, body)
         : await api.admin.createUser({ ...body, password: form.password || undefined });
@@ -45,13 +45,31 @@ function UserModal({ open, target, onClose, onSaved }) {
             <Input type="password" value={form.password} onChange={e => set({ password: e.target.value })} minLength={8} autoComplete="new-password" />
           </Field>
         )}
-        <label className="flex items-start gap-2.5 cursor-pointer">
-          <Checkbox checked={form.isSuperAdmin} onChange={v => set({ isSuperAdmin: v })} className="mt-0.5" />
-          <span>
-            <span className="block text-[13px] text-text-primary">Super Admin</span>
-            <span className="block text-[11px] text-text-muted">Acesso total ao Admin Center e a todos os workspaces. Alterar este acesso encerra as sessões do usuário.</span>
-          </span>
-        </label>
+        {target && target.email !== form.email.trim() && <Alert tone="info">O novo e-mail precisará ser confirmado pelo usuário.</Alert>}
+        <p className="text-[11px] text-text-muted">O privilégio de Super Admin não é editável aqui: ele é gerenciado apenas no console do servidor (<span className="font-mono">npm run admin:grant</span> / <span className="font-mono">admin:revoke</span>).</p>
+      </form>
+    </Modal>
+  );
+}
+
+function ResetMfaModal({ target, onClose, onDone }) {
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const submit = async e => {
+    e.preventDefault();
+    setBusy(true); setError(null);
+    try { await api.admin.resetMfa(target.id, reason.trim()); onDone(target); } catch (err) { setError(errorText(err)); } finally { setBusy(false); }
+  };
+  return (
+    <Modal open={Boolean(target)} onClose={onClose} title={`Redefinir MFA de ${target?.name || ''}`} size="sm"
+      footer={<><Btn onClick={onClose}>Cancelar</Btn><Btn variant="danger" type="submit" form="reset-mfa-form" loading={busy} disabled={reason.trim().length < 10}>Redefinir MFA</Btn></>}>
+      <form id="reset-mfa-form" onSubmit={submit} className="flex flex-col gap-4">
+        <Alert tone="warning">Confirme a identidade da pessoa por outro canal antes de continuar. O MFA será desativado, as sessões dela serão encerradas e ela será notificada.</Alert>
+        <Field label="Motivo" required hint="Fica registrado na auditoria.">
+          <Textarea value={reason} onChange={e => setReason(e.target.value)} maxLength={300} data-autofocus placeholder="Ex.: Perdeu o celular; identidade confirmada por videochamada" />
+        </Field>
+        {error && <Alert tone="danger">{error}</Alert>}
       </form>
     </Modal>
   );
@@ -64,6 +82,7 @@ export function AdminUsers() {
   const [page, setPage] = useState(1);
   const [modal, setModal] = useState(null); // null | { target? }
   const [setupLink, setSetupLink] = useState(null);
+  const [resetTarget, setResetTarget] = useState(null);
   const query = useDebounce(q.trim(), 300);
   const { data, loading, error, reload, setData } = useAsync(() => api.admin.users({ q: query, status, page, limit: 25 }), [query, status, page]);
   const users = data?.users || [];
@@ -133,10 +152,14 @@ export function AdminUsers() {
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Avatar user={u} size={28} />
                         <span className="text-text-primary font-medium truncate">{u.name}{self && <span className="text-text-muted font-normal"> (você)</span>}</span>
-                        {u.isSuperAdmin && <Pill className="text-amber-400 bg-amber-500/10 border-amber-500/25">Super Admin</Pill>}
+                        {u.isSuperAdmin && <Pill className="text-amber-400 bg-amber-500/10 border-amber-500/25" title="Gerenciado apenas no console do servidor">Super Admin</Pill>}
+                        {u.mfaEnabled && <Pill title="Verificação em duas etapas ativa">MFA</Pill>}
                       </div>
                     </Td>
-                    <Td className="max-w-[220px]"><span className="block truncate">{u.email}</span></Td>
+                    <Td className="max-w-[220px]">
+                      <span className="block truncate">{u.email}</span>
+                      {!u.emailVerified && <span className="text-[10px] text-amber-400">não confirmado</span>}
+                    </Td>
                     <Td>{u.status === 'BLOCKED' ? <Pill className="text-red-400 bg-red-500/10 border-red-500/25">Bloqueado</Pill> : <Pill className="text-emerald-400 bg-emerald-500/10 border-emerald-500/25">Ativo</Pill>}</Td>
                     <Td><span title={u.workspaces.map(w => `${w.name} (${w.role || '—'})`).join('\n') || undefined}>{u.workspaces.length}</span></Td>
                     <Td>{u.projectCount}</Td>
@@ -145,6 +168,7 @@ export function AdminUsers() {
                       <RowMenu label={`Ações de ${u.name}`} items={[
                         { label: 'Editar', icon: 'edit', onClick: () => setModal({ target: u }) },
                         !self && { label: u.status === 'ACTIVE' ? 'Bloquear' : 'Desbloquear', icon: u.status === 'ACTIVE' ? 'block' : 'lock_open', onClick: () => toggleStatus(u) },
+                        !self && u.mfaEnabled && { label: 'Redefinir MFA', icon: 'phonelink_lock', onClick: () => setResetTarget(u) },
                         !self && '-',
                         !self && { label: 'Remover', icon: 'person_remove', danger: true, onClick: () => remove(u) }
                       ]} />
@@ -160,6 +184,7 @@ export function AdminUsers() {
       </AsyncBoundary>
 
       <UserModal open={Boolean(modal)} target={modal?.target} onClose={() => setModal(null)} onSaved={onSaved} />
+      <ResetMfaModal target={resetTarget} onClose={() => setResetTarget(null)} onDone={u => { setResetTarget(null); patch({ id: u.id, mfaEnabled: false }); toast(`MFA de ${u.name} redefinido`, 'success'); }} />
       <Modal open={Boolean(setupLink)} onClose={() => setSetupLink(null)} title="Usuário criado" description={setupLink?.email} footer={<Btn variant="primary" onClick={() => setSetupLink(null)}>Concluir</Btn>}>
         <div className="flex flex-col gap-3">
           <Alert tone="warning">O envio de e-mails (SMTP) não está configurado. Envie este link ao usuário para que ele defina a senha. O link é válido por 72 horas e não será exibido novamente.</Alert>

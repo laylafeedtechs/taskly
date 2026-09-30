@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
-import { Icon, IconBtn, Avatar, Menu, Kbd } from '../ui';
+import { Icon, IconBtn, Avatar, Menu, Kbd, Modal, Btn, Alert, Field, Textarea } from '../ui';
 import { ROLE_LABEL } from '../../lib/format';
 
 const TITLES = {
@@ -13,6 +13,7 @@ const TITLES = {
 export function Header() {
   const { route, params, projects, currentWorkspace, user, auth, unreadCount, navigate, setPaletteOpen, openQuickCreate, setHelpOpen, setShortcutsOpen, setSidebarOpen, logout, switchAccount } = useApp();
   const [accounts, setAccounts] = useState([]);
+  const [support, setSupport] = useState(null); // { account, reason, busy }
 
   // The server decides which accounts are switchable; nothing is filtered here.
   useEffect(() => {
@@ -73,12 +74,25 @@ export function Header() {
             '-',
             { label: 'Central de ajuda', icon: 'help', onClick: () => setHelpOpen(true) },
             { label: 'Atalhos de teclado', icon: 'keyboard', hint: '?', onClick: () => setShortcutsOpen(true) },
-            ...(others.length ? ['-', { header: auth.impersonatedBy ? 'Trocar de conta' : 'Acessar como (suporte)' }, ...others.slice(0, 6).map(a => ({ label: a.id === realUserId ? `${a.name} (minha conta)` : a.name, icon: a.id === realUserId ? 'undo' : 'switch_account', onClick: () => switchAccount(a.id) }))] : []),
+            ...(others.length ? ['-', { header: auth.impersonatedBy ? 'Trocar de conta' : 'Acessar como (suporte)' }, ...others.slice(0, 6).map(a => ({ label: a.id === realUserId ? `${a.name} (minha conta)` : a.name, icon: a.id === realUserId ? 'undo' : 'switch_account', onClick: () => (a.id === realUserId ? switchAccount(a.id) : setSupport({ account: a, reason: '', busy: false })) }))] : []),
             '-',
             { label: 'Sair', icon: 'logout', danger: true, onClick: logout }
           ]} />
         </div>
       </header>
+      <Modal open={Boolean(support)} onClose={() => setSupport(null)} title={`Acessar como ${support?.account.name || ''}`} size="sm"
+        footer={<>
+          <Btn onClick={() => setSupport(null)}>Cancelar</Btn>
+          <Btn variant="primary" loading={support?.busy} disabled={(support?.reason.trim().length || 0) < 10}
+            onClick={async () => { setSupport(s => ({ ...s, busy: true })); await switchAccount(support.account.id, support.reason.trim()); setSupport(s => (s ? { ...s, busy: false } : s)); }}>Iniciar acesso de suporte</Btn>
+        </>}>
+        <div className="flex flex-col gap-3">
+          <Alert tone="warning">O titular da conta será notificado. O acesso é registrado na auditoria, não dá direitos administrativos e expira em até 2 horas.</Alert>
+          <Field label="Motivo do acesso" required hint="Mínimo de 10 caracteres. Fica registrado e é mostrado ao titular.">
+            <Textarea value={support?.reason || ''} onChange={e => setSupport(s => ({ ...s, reason: e.target.value }))} maxLength={300} data-autofocus placeholder="Ex.: Chamado #123 — cliente não consegue mover tarefas" />
+          </Field>
+        </div>
+      </Modal>
     </>
   );
 }

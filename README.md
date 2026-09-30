@@ -39,6 +39,23 @@ Copie `.env.example` para `.env`. Tudo é opcional em desenvolvimento.
 | E-mail (convites, redefinição de senha, notificações) | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | E-mails gravados em `data/outbox/`; links de convite exibidos na interface |
 | URLs públicas, CORS | `APP_URL`, `CORS_ORIGINS` | `http://localhost:3000` |
 
+## Administração pelo console
+
+```bash
+npm run admin:grant -- pessoa@empresa.com    # conceder Super Admin (servidor parado)
+npm run admin:revoke -- pessoa@empresa.com   # remover Super Admin
+npm run backup:restore                       # listar backups cifrados
+npm run backup:restore -- <arquivo>          # restaurar (servidor parado)
+```
+
+O Admin Center exige que o Super Admin tenha MFA ativo e tenha entrado com o segundo fator.
+
+## Privacidade e LGPD
+
+Documentação em [`docs/lgpd/`](docs/lgpd/README.md) e relatório técnico em
+[`docs/seguranca/relatorio-auditoria.md`](docs/seguranca/relatorio-auditoria.md).
+Os controles técnicos apoiam a adequação, mas não substituem a revisão jurídica.
+
 ## Segurança (resumo)
 
 - Sessões em cookie `HttpOnly` + `SameSite=Lax` (`Secure` em produção), armazenadas com hash, com expiração absoluta e por inatividade.

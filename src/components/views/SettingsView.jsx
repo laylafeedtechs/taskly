@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Field, Icon, PageHeader, Select } from '../ui';
 import { ProfileSection, SecuritySection } from '../settings/AccountSections';
+import { PrivacyCenterSection } from '../settings/PrivacySections';
 import { AppearanceSection, LanguageSection, NotificationPrefsSection, ShortcutsSection } from '../settings/PreferenceSections';
 import { MembersLinkSection, WorkspaceSection } from '../settings/WorkspaceSections';
 import { PermissionMatrixSection } from '../settings/PermissionMatrix';
@@ -12,7 +13,8 @@ import { AppsSection, BillingSection } from '../settings/IntegrationSections';
 const GROUPS = [
   { label: 'Conta', items: [
     { id: 'profile', label: 'Perfil', icon: 'person', Component: ProfileSection },
-    { id: 'security', label: 'Segurança', icon: 'shield', Component: SecuritySection }
+    { id: 'security', label: 'Segurança', icon: 'shield', Component: SecuritySection },
+    { id: 'privacy', label: 'Central de Privacidade', icon: 'shield_person', Component: PrivacyCenterSection }
   ] },
   { label: 'Preferências', items: [
     { id: 'appearance', label: 'Aparência', icon: 'palette', Component: AppearanceSection },

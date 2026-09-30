@@ -5,6 +5,7 @@ import { useAsync } from '../../lib/hooks';
 import { formatDateTime, timeAgo } from '../../lib/format';
 import { Alert, AsyncBoundary, Avatar, Btn, Field, Icon, Input, Pill } from '../ui';
 import { Section, errorText } from './common';
+import { MfaSection, EmailStatusSection } from './MfaSection';
 
 const AVATAR_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 const AVATAR_MAX = 2 * 1024 * 1024;
@@ -168,18 +169,26 @@ export function SecuritySection() {
   };
 
   const revokeOthers = async () => {
-    const ok = await confirm({ title: 'Encerrar outras sessões?', message: `${others.length} sessão(ões) serão desconectadas. Esta sessão continua ativa.`, confirmLabel: 'Encerrar sessões', danger: true });
-    if (ok) revoke(others.map(s => s.id));
+    const ok = await confirm({ title: 'Sair de todos os outros dispositivos?', message: `${others.length} sessão(ões) serão desconectadas. Esta sessão continua ativa.`, confirmLabel: 'Encerrar sessões', danger: true });
+    if (!ok) return;
+    setRevoking('all');
+    try {
+      await api.auth.revokeOtherSessions();
+      setData(d => ({ ...d, sessions: d.sessions.filter(x => x.current) }));
+      toast('Outras sessões encerradas', 'success');
+    } catch (err) { showError(err); } finally { setRevoking(null); }
   };
 
   return (
     <div className="flex flex-col gap-5">
+      <MfaSection />
+      <EmailStatusSection />
       <Section title={user.hasPassword ? 'Alterar senha' : 'Definir senha'} description="Ao alterar a senha, as demais sessões são encerradas automaticamente.">
         <PasswordForm onChanged={reload} />
       </Section>
 
       <Section title="Sessões ativas" description="Dispositivos conectados à sua conta."
-        actions={others.length > 0 && <Btn variant="danger" icon="logout" loading={revoking === 'all'} onClick={revokeOthers}>Encerrar outras sessões</Btn>}>
+        actions={others.length > 0 && <Btn variant="danger" icon="logout" loading={revoking === 'all'} onClick={revokeOthers}>Sair de todos os outros dispositivos</Btn>}>
         <AsyncBoundary loading={loading && !data} error={error} onRetry={reload} empty={!sessions.length} rows={2}>
           <ul className="divide-y divide-border-subtle border border-border rounded-lg">
             {sessions.map(s => {
@@ -191,6 +200,8 @@ export function SecuritySection() {
                     <div className="flex items-center gap-2 text-[13px] text-text-primary">
                       {device.label}
                       {s.current && <Pill className="text-emerald-400 bg-emerald-500/10 border-emerald-500/25">Esta sessão</Pill>}
+                      {s.mfa && <Pill title="Autenticada com verificação em duas etapas">MFA</Pill>}
+                      {s.support && <Pill className="text-amber-400 bg-amber-500/10 border-amber-500/25" title="Sessão aberta por um administrador para suporte">Acesso de suporte</Pill>}
                     </div>
                     <div className="text-[11px] text-text-muted mt-0.5">
                       {s.ip || 'IP desconhecido'} · ativa {timeAgo(s.lastSeenAt)} · iniciada em {formatDateTime(s.createdAt)}

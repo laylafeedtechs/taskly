@@ -5,6 +5,8 @@ import { Header } from './components/layout/Header';
 import { ToastContainer, ConfirmDialog } from './components/common/ToastContainer';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoginView } from './components/views/LoginView';
+import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
+import { EmailVerificationBanner } from './components/common/EmailVerificationBanner';
 import { SearchPalette } from './components/common/SearchPalette';
 import { QuickCreateModal } from './components/common/QuickCreateModal';
 import { HelpCenterModal, ShortcutsModal } from './components/common/HelpCenterModal';
@@ -77,9 +79,11 @@ function CurrentView() {
 }
 
 function Shell() {
-  const { auth, query, toasts, removeToast, maintenanceBanner } = useApp();
+  const { auth, route, query, toasts, removeToast, maintenanceBanner } = useApp();
 
   if (auth.status === 'loading') return <Splash />;
+  // The privacy notice is public and standalone.
+  if (route === 'privacy') return <PrivacyPolicyView />;
   // Password reset links work whether or not someone is signed in.
   if (auth.status !== 'authed' || query.reset) {
     return (
@@ -97,6 +101,7 @@ function Shell() {
       <Sidebar />
       <div className="lg:pl-64 flex flex-col min-w-0 min-h-screen">
         <Header />
+        <EmailVerificationBanner />
         {maintenanceBanner && <div role="status" className="bg-amber-500/10 border-b border-amber-500/25 text-amber-300 text-[12px] px-6 py-2">{maintenanceBanner}</div>}
         <main id="main" className="flex-1 min-w-0 w-full">
           <ErrorBoundary>

@@ -882,6 +882,15 @@ function migrateV3(data) {
   data.meta.auditChainHead = prev === 'genesis' ? undefined : prev;
 }
 
+// Demo accounts (with a publicly known password) are only seeded outside
+// production. A production database starts with no users; the first Super
+// Admin is granted from the console (npm run admin:grant).
+function initialData() {
+  const seed = JSON.parse(JSON.stringify(defaultData));
+  if (process.env.NODE_ENV !== 'production' && process.env.TASKLY_DEMO_SEED !== 'false') return seed;
+  return { projectTemplates: seed.projectTemplates, featureFlags: seed.featureFlags };
+}
+
 class Database {
   constructor() {
     this.init();
@@ -889,7 +898,7 @@ class Database {
 
   init() {
     if (!fs.existsSync(DB_FILE)) {
-      this.data = JSON.parse(JSON.stringify(defaultData));
+      this.data = initialData();
     } else {
       try {
         this.data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));

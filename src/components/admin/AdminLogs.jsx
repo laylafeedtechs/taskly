@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { api } from '../../services/api';
 import { useAsync, useDebounce } from '../../lib/hooks';
 import { formatDateTime } from '../../lib/format';
-import { AsyncBoundary, EmptyState, Field, Input, Pagination, Pill, SearchInput, Select } from '../ui';
+import { Alert, AsyncBoundary, Btn, EmptyState, Field, Input, Pagination, Pill, SearchInput, Select } from '../ui';
 import { TableWrap, Td, Th } from '../settings/common';
 
 const SEVERITY = {
@@ -99,9 +99,22 @@ export function AuditLogs() {
     [q, filters.category, filters.result, filters.from, filters.to, page]
   );
   const logs = state.data?.auditLogs || [];
+  const [integrity, setIntegrity] = useState(null);
+  const verify = async () => {
+    setIntegrity({ loading: true });
+    try { setIntegrity(await api.admin.auditIntegrity()); } catch (err) { setIntegrity({ error: err.message }); }
+  };
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <Btn icon="verified" loading={integrity?.loading} onClick={verify}>Verificar integridade</Btn>
+        {integrity && !integrity.loading && (integrity.error
+          ? <Alert tone="danger">{integrity.error}</Alert>
+          : integrity.ok
+            ? <span className="text-[12px] text-emerald-400">Cadeia íntegra — {integrity.checked} registro(s) verificados.</span>
+            : <Alert tone="danger">A cadeia de auditoria foi alterada a partir do registro {integrity.brokenAt} ({integrity.timestamp}). Trate como incidente de segurança.</Alert>)}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1.6fr_1fr_1fr_1fr_1fr] gap-3 items-end">
         <Field label="Buscar"><SearchInput value={filters.q} onChange={v => update({ q: v })} placeholder="Ator, ação, entidade ou IP…" /></Field>
         <Field label="Categoria">

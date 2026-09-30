@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
-import { Btn, Field, Input, Alert, Icon } from '../ui';
+import { Btn, Field, Input, Alert, Icon, Checkbox } from '../ui';
 import { ROLE_LABEL } from '../../lib/format';
 import { InstallAppButton } from '../common/InstallAppButton';
 
@@ -26,8 +26,11 @@ function GoogleIcon() {
 export function LoginView() {
   const { query, setQuery, loadSession, auth, navigate } = useApp();
   const resetToken = query.reset;
-  const [mode, setMode] = useState(resetToken ? 'reset' : 'login');
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
+  const [mode, setMode] = useState(resetToken ? 'reset' : query.mfa ? 'mfa' : 'login');
+  const [challenge, setChallenge] = useState(query.mfa || null);
+  const [useRecovery, setUseRecovery] = useState(false);
+  const [acceptPolicy, setAcceptPolicy] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '', code: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(query.auth_error ? AUTH_ERRORS[query.auth_error] || 'Falha na autenticação.' : '');
@@ -39,6 +42,8 @@ export function LoginView() {
   useEffect(() => {
     api.auth.providers().then(setProviders).catch(() => {});
     if (query.auth_error) setQuery({ auth_error: null });
+    // Google sign-in hands over the MFA challenge in the URL; keep it only in memory.
+    if (query.mfa) setQuery({ mfa: null });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -61,10 +66,20 @@ export function LoginView() {
     setLoading(true);
     try {
       if (mode === 'login') {
-        await api.auth.login(form.email, form.password);
+        const res = await api.auth.login(form.email, form.password);
+        if (res.mfaRequired) {
+          setChallenge(res.challenge);
+          setForm(f => ({ ...f, password: '', code: '' }));
+          setMode('mfa');
+          return;
+        }
+        await loadSession();
+      } else if (mode === 'mfa') {
+        await api.mfa.verify(challenge, useRecovery ? { recoveryCode: form.code } : { code: form.code });
         await loadSession();
       } else if (mode === 'signup') {
-        await api.auth.signup(form.name, form.email, form.password);
+        if (!acceptPolicy) throw new Error('Declare que leu a Política de Privacidade para continuar.');
+        await api.auth.signup(form.name, form.email, form.password, true);
         await loadSession();
       } else if (mode === 'forgot') {
         const res = await api.auth.forgotPassword(form.email);
@@ -89,7 +104,8 @@ export function LoginView() {
     login: ['Entrar no Taskly', 'Bem-vindo de volta'],
     signup: ['Criar sua conta', 'Comece a organizar o trabalho da sua equipe'],
     forgot: ['Recuperar senha', 'Enviaremos um link de redefinição para o seu e-mail'],
-    reset: ['Definir nova senha', 'Escolha uma senha com pelo menos 8 caracteres']
+    reset: ['Definir nova senha', 'Escolha uma senha com pelo menos 8 caracteres'],
+    mfa: ['Verificação em duas etapas', useRecovery ? 'Digite um dos seus códigos de recuperação' : 'Digite o código de 6 dígitos do seu aplicativo autenticador']
   };
 
   return (
@@ -126,12 +142,23 @@ export function LoginView() {
                 <Input value={form.name} onChange={set('name')} autoComplete="name" required minLength={2} placeholder="Seu nome" />
               </Field>
             )}
-            {mode !== 'reset' && (
+            {mode === 'mfa' && (
+              <Field label={useRecovery ? 'Código de recuperação' : 'Código de verificação'} required>
+                <Input value={form.code} onChange={set('code')} autoFocus required autoComplete="one-time-code"
+                  inputMode={useRecovery ? 'text' : 'numeric'} maxLength={useRecovery ? 12 : 6} placeholder={useRecovery ? 'xxxxx-xxxxx' : '000000'} className="font-mono tracking-widest text-center" />
+              </Field>
+            )}
+            {mode === 'mfa' && (
+              <button type="button" onClick={() => { setUseRecovery(r => !r); setForm(f => ({ ...f, code: '' })); }} className="self-start -mt-2 text-[12px] text-text-secondary hover:text-text-primary">
+                {useRecovery ? 'Usar o código do aplicativo' : 'Não tenho acesso ao aplicativo — usar código de recuperação'}
+              </button>
+            )}
+            {mode !== 'reset' && mode !== 'mfa' && (
               <Field label="E-mail" required>
                 <Input type="email" value={form.email} onChange={set('email')} autoComplete="email" required placeholder="voce@empresa.com" />
               </Field>
             )}
-            {mode !== 'forgot' && (
+            {mode !== 'forgot' && mode !== 'mfa' && (
               <Field label={mode === 'reset' ? 'Nova senha' : 'Senha'} required hint={mode !== 'login' ? 'Mínimo de 8 caracteres' : undefined}>
                 <div className="relative">
                   <Input type={showPassword ? 'text' : 'password'} value={form.password} onChange={set('password')} required minLength={mode === 'login' ? 1 : 8}
@@ -151,11 +178,18 @@ export function LoginView() {
               <button type="button" onClick={() => switchMode('forgot')} className="self-end -mt-2 text-[12px] text-text-secondary hover:text-text-primary">Esqueceu a senha?</button>
             )}
 
+            {mode === 'signup' && (
+              <label className="flex items-start gap-2.5 text-[12px] text-text-secondary cursor-pointer">
+                <Checkbox checked={acceptPolicy} onChange={setAcceptPolicy} label="Ciência da Política de Privacidade" className="mt-0.5" />
+                <span>Li e estou ciente da <a href="/privacy" target="_blank" rel="noopener" className="text-text-primary underline underline-offset-2">Política de Privacidade</a>, que explica como meus dados são tratados.</span>
+              </label>
+            )}
+
             {error && <Alert tone="danger">{error}</Alert>}
             {notice && <Alert tone="success">{notice}</Alert>}
 
             <Btn type="submit" variant="primary" size="lg" loading={loading} className="w-full">
-              {{ login: 'Entrar', signup: 'Criar minha conta', forgot: 'Enviar link', reset: 'Salvar nova senha' }[mode]}
+              {{ login: 'Entrar', signup: 'Criar minha conta', forgot: 'Enviar link', reset: 'Salvar nova senha', mfa: 'Verificar' }[mode]}
             </Btn>
           </form>
 
@@ -172,7 +206,7 @@ export function LoginView() {
             </>
           )}
 
-          {(mode === 'forgot' || mode === 'reset') && (
+          {(mode === 'forgot' || mode === 'reset' || mode === 'mfa') && (
             <button type="button" onClick={() => { setQuery({ reset: null }); switchMode('login'); }} className="w-full mt-4 text-[12px] text-text-secondary hover:text-text-primary flex items-center justify-center gap-1">
               <Icon name="arrow_back" size={14} />Voltar para o login
             </button>
@@ -184,6 +218,9 @@ export function LoginView() {
             <p className="mt-5 text-[11px] text-text-muted text-center">Ambiente de desenvolvimento — conta de demonstração: <span className="font-mono text-text-secondary">lucas@taskly.io</span> / <span className="font-mono text-text-secondary">taskly123</span></p>
           )}
         </div>
+        <p className="mt-5 text-center text-[12px] text-text-muted">
+          <a href="/privacy" className="hover:text-text-primary underline-offset-2 hover:underline">Política de Privacidade e cookies</a>
+        </p>
       </div>
     </div>
   );

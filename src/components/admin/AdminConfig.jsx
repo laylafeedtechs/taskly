@@ -103,8 +103,8 @@ export function AdminFlags() {
 }
 
 function SettingsForm({ settings, onSaved }) {
-  const { toast } = useApp();
-  const initial = { allowSignup: settings.allowSignup !== false, maintenanceBanner: settings.maintenanceBanner || '', sessionDays: settings.sessionDays || 7 };
+  const { toast, confirm } = useApp();
+  const initial = { allowSignup: settings.allowSignup !== false, maintenanceBanner: settings.maintenanceBanner || '', sessionDays: settings.sessionDays || 7, requireMfaForAdmins: settings.requireMfaForAdmins !== false };
   const [form, setForm] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -115,7 +115,11 @@ function SettingsForm({ settings, onSaved }) {
     e.preventDefault();
     setSaving(true); setError(null);
     try {
-      const res = await api.admin.updateSettings({ allowSignup: form.allowSignup, maintenanceBanner: form.maintenanceBanner.trim(), sessionDays: Number(form.sessionDays) });
+      if (initial.requireMfaForAdmins && !form.requireMfaForAdmins) {
+        const ok = await confirm({ title: 'Deixar de exigir MFA dos Super Admins?', message: 'Contas com acesso total à plataforma ficarão protegidas apenas por senha. Não é recomendado.', confirmLabel: 'Desativar exigência', danger: true, requireText: 'DESATIVAR' });
+        if (!ok) { setSaving(false); return; }
+      }
+      const res = await api.admin.updateSettings({ allowSignup: form.allowSignup, maintenanceBanner: form.maintenanceBanner.trim(), sessionDays: Number(form.sessionDays), requireMfaForAdmins: form.requireMfaForAdmins });
       onSaved(res.settings);
       toast('Configurações do sistema salvas', 'success');
     } catch (err) { setError(errorText(err)); } finally { setSaving(false); }
@@ -125,6 +129,7 @@ function SettingsForm({ settings, onSaved }) {
     <form onSubmit={submit} className="flex flex-col gap-5 max-w-2xl">
       {error && <Alert tone="danger">{error}</Alert>}
       <Toggle checked={form.allowSignup} onChange={allowSignup => setForm(f => ({ ...f, allowSignup }))} label="Permitir cadastro público" description="Quando desativado, novas contas só podem ser criadas por administradores ou por convite." />
+      <Toggle checked={form.requireMfaForAdmins} onChange={requireMfaForAdmins => setForm(f => ({ ...f, requireMfaForAdmins }))} label="Exigir MFA para Super Admins" description="O Admin Center e o acesso de suporte só funcionam em sessões verificadas com o segundo fator. Recomendado." />
       <Field label="Aviso de manutenção" hint="Exibido no topo do app para todos os usuários. Deixe vazio para ocultar (máx. 300 caracteres).">
         <Textarea value={form.maintenanceBanner} onChange={e => setForm(f => ({ ...f, maintenanceBanner: e.target.value }))} maxLength={300} className="min-h-[64px]" />
       </Field>
