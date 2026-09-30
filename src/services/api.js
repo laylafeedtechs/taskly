@@ -91,6 +91,8 @@ export const api = {
     updateProfile: data => put('/auth/profile', data),
     uploadAvatar: (name, data) => post('/auth/avatar', { name, data }),
     removeAvatar: () => del('/auth/avatar'),
+    googleLinkUrl: () => '/api/auth/google/link',
+    unlinkGoogle: password => post('/auth/google/unlink', { password }),
     googleStartUrl: invite => `/api/auth/google/start${invite ? `?invite=${encodeURIComponent(invite)}` : ''}`
   },
 

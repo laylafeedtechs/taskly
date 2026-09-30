@@ -289,79 +289,118 @@ router.delete('/sessions/:id', authenticate, sessionOnly, (req, res) => {
 
 // ---------------------------------------------------- Google OAuth 2.0
 
+// The browser only holds an opaque state token; verifier, nonce and the
+// linking target live server-side, are single-use and expire in 10 minutes.
 const OAUTH_COOKIE = 'taskly_oauth';
+const googleConfigured = () => Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const redirectUri = () => `${APP_URL()}/api/auth/google/callback`;
 
-router.get('/google/start', (req, res) => {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  if (!clientId || !process.env.GOOGLE_CLIENT_SECRET) return res.redirect(`${APP_URL()}/?auth_error=google_not_configured`);
+function beginGoogleFlow(req, res, { mode, linkUserId = null }) {
   const state = randomToken(24);
   const nonce = randomToken(24);
   const verifier = randomToken(48);
-  const challenge = crypto.createHash('sha256').update(verifier).digest('base64url');
-  res.cookie(OAUTH_COOKIE, JSON.stringify({ state, nonce, verifier, invite: String(req.query.invite || '').slice(0, 200) }), {
-    httpOnly: true, secure: isProd, sameSite: 'lax', maxAge: 10 * 60 * 1000, path: '/api/auth/google'
+  db.remove('oauthStates', s => Date.parse(s.expiresAt) < Date.now());
+  db.insert('oauthStates', {
+    id: newId('oas'), stateHash: sha256(state), nonce, verifier, mode, linkUserId,
+    invite: String(req.query.invite || '').slice(0, 200), expiresAt: new Date(Date.now() + 10 * 60000).toISOString()
   });
+  res.cookie(OAUTH_COOKIE, state, { httpOnly: true, secure: isProd, sameSite: 'lax', maxAge: 10 * 60 * 1000, path: '/api/auth/google' });
   const params = new URLSearchParams({
-    client_id: clientId,
-    redirect_uri: `${APP_URL()}/api/auth/google/callback`,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: redirectUri(),
     response_type: 'code',
     scope: 'openid email profile',
     state,
     nonce,
-    code_challenge: challenge,
+    code_challenge: crypto.createHash('sha256').update(verifier).digest('base64url'),
     code_challenge_method: 'S256',
     prompt: 'select_account'
   });
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+}
+
+// Sign in (or sign up) with Google.
+router.get('/google/start', (req, res) => {
+  if (!googleConfigured()) return res.redirect(`${APP_URL()}/?auth_error=google_not_configured`);
+  beginGoogleFlow(req, res, { mode: 'login' });
 });
 
-router.get('/google/callback', async (req, res) => {
-  const fail = (code, detail) => {
-    recordEvent('auth.oauth_failed', `Falha no login Google: ${code}`, { detail }, 'warn');
-    res.clearCookie(OAUTH_COOKIE, { path: '/api/auth/google' });
-    return res.redirect(`${APP_URL()}/?auth_error=${code}`);
-  };
-  let stored;
-  try { stored = JSON.parse(req.cookies?.[OAUTH_COOKIE] || ''); } catch { return fail('oauth_state'); }
-  res.clearCookie(OAUTH_COOKIE, { path: '/api/auth/google' });
+// Link a Google account to the signed-in user (Configurações → Segurança).
+router.get('/google/link', (req, res, next) => authenticate(req, res, err => {
+  if (err) return res.redirect(`${APP_URL()}/?auth_error=session_required`);
+  if (req.apiKey || req.session.impersonatorId) return res.redirect(`${APP_URL()}/settings/security?auth_error=link_forbidden`);
+  if (!googleConfigured()) return res.redirect(`${APP_URL()}/settings/security?auth_error=google_not_configured`);
+  beginGoogleFlow(req, res, { mode: 'link', linkUserId: req.user.id });
+}));
 
+// Exchanges the code and validates the ID token claims.
+async function verifyGoogleCode(code, flow) {
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code: String(code), client_id: process.env.GOOGLE_CLIENT_ID, client_secret: process.env.GOOGLE_CLIENT_SECRET,
+      redirect_uri: redirectUri(), grant_type: 'authorization_code', code_verifier: flow.verifier
+    }),
+    signal: AbortSignal.timeout(10000)
+  });
+  const tokens = await tokenRes.json();
+  if (!tokenRes.ok || !tokens.id_token) return { error: 'oauth_failed', detail: tokens.error };
+  // Google validates the ID token signature; we validate the claims.
+  const infoRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(tokens.id_token)}`, { signal: AbortSignal.timeout(10000) });
+  const claims = await infoRes.json();
+  if (!infoRes.ok) return { error: 'oauth_failed', detail: 'invalid id_token' };
+  if (claims.aud !== process.env.GOOGLE_CLIENT_ID) return { error: 'oauth_failed', detail: 'aud mismatch' };
+  if (!['accounts.google.com', 'https://accounts.google.com'].includes(claims.iss)) return { error: 'oauth_failed', detail: 'iss mismatch' };
+  if (claims.nonce !== flow.nonce) return { error: 'oauth_failed', detail: 'nonce mismatch' };
+  if (Number(claims.exp) * 1000 < Date.now()) return { error: 'oauth_failed', detail: 'expired' };
+  if (claims.email_verified !== 'true' && claims.email_verified !== true) return { error: 'oauth_unverified' };
+  return { claims };
+}
+
+router.get('/google/callback', async (req, res) => {
+  const token = req.cookies?.[OAUTH_COOKIE];
+  res.clearCookie(OAUTH_COOKIE, { path: '/api/auth/google' });
+  const flow = token ? db.find('oauthStates', s => s.stateHash === sha256(token)) : null;
+  if (flow) db.remove('oauthStates', s => s.id === flow.id); // single use
+  const base = flow?.mode === 'link' ? `${APP_URL()}/settings/security` : `${APP_URL()}/`;
+  const fail = (code, detail) => {
+    recordEvent('auth.oauth_failed', `Falha no ${flow?.mode === 'link' ? 'vínculo' : 'login'} Google: ${code}`, { detail }, 'warn');
+    return res.redirect(`${base}?auth_error=${code}`);
+  };
+
+  if (!flow || Date.parse(flow.expiresAt) < Date.now()) return fail('oauth_state');
   if (req.query.error) return fail(req.query.error === 'access_denied' ? 'oauth_cancelled' : 'oauth_failed', req.query.error);
-  if (!req.query.state || req.query.state !== stored.state) return fail('oauth_state');
+  if (!req.query.state || sha256(String(req.query.state)) !== flow.stateHash) return fail('oauth_state');
   if (!req.query.code) return fail('oauth_failed', 'missing code');
 
   try {
-    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code: String(req.query.code),
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${APP_URL()}/api/auth/google/callback`,
-        grant_type: 'authorization_code',
-        code_verifier: stored.verifier
-      }),
-      signal: AbortSignal.timeout(10000)
-    });
-    const tokens = await tokenRes.json();
-    if (!tokenRes.ok || !tokens.id_token) return fail('oauth_failed', tokens.error);
-
-    // Google validates the ID token signature; we validate the claims.
-    const infoRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(tokens.id_token)}`, { signal: AbortSignal.timeout(10000) });
-    const claims = await infoRes.json();
-    if (!infoRes.ok) return fail('oauth_failed', 'invalid id_token');
-    if (claims.aud !== process.env.GOOGLE_CLIENT_ID) return fail('oauth_failed', 'aud mismatch');
-    if (!['accounts.google.com', 'https://accounts.google.com'].includes(claims.iss)) return fail('oauth_failed', 'iss mismatch');
-    if (claims.nonce !== stored.nonce) return fail('oauth_failed', 'nonce mismatch');
-    if (Number(claims.exp) * 1000 < Date.now()) return fail('oauth_failed', 'expired');
-    if (claims.email_verified !== 'true' && claims.email_verified !== true) return fail('oauth_unverified');
-
+    const { claims, error, detail } = await verifyGoogleCode(req.query.code, flow);
+    if (error) return fail(error, detail);
     // Only the Google subject id, name and verified e-mail are used. The profile
     // picture URL is not stored (it would make every viewer's browser call Google).
     const email = String(claims.email).toLowerCase();
+
+    if (flow.mode === 'link') {
+      // The link must complete in the same account that started it.
+      const sessionErr = await new Promise(resolve => authenticate(req, res, resolve));
+      if (sessionErr || req.user?.id !== flow.linkUserId) return fail('session_required');
+      const owner = db.find('users', u => u.googleSub === claims.sub);
+      if (owner && owner.id !== req.user.id) {
+        audit(req, { action: 'GOOGLE_LINK_DENIED', entity: 'Conta Google já vinculada a outro usuário', result: 'BLOCKED', category: 'security' });
+        return fail('google_in_use');
+      }
+      req.user.googleSub = claims.sub;
+      if (email === req.user.email.toLowerCase()) req.user.emailVerified = true;
+      db.save();
+      audit(req, { action: 'GOOGLE_LINKED', entity: `Usuário ${req.user.id}`, category: 'security' });
+      notify(req.user.id, { event: 'security', title: 'Conta Google vinculada', description: `A conta Google ${email} agora pode ser usada para entrar no Taskly. Se não foi você, desvincule em Configurações → Segurança e altere sua senha.` });
+      return res.redirect(`${base}?google=linked`);
+    }
+
     let user = db.find('users', u => u.googleSub === claims.sub) || db.find('users', u => u.email.toLowerCase() === email);
     if (!user) {
-      if (db.data.systemSettings?.allowSignup === false && !stored.invite) return fail('signup_disabled');
+      if (db.data.systemSettings?.allowSignup === false && !flow.invite) return fail('signup_disabled');
       ({ user } = createUserWithWorkspace({ name: claims.name || email.split('@')[0], email, googleSub: claims.sub, emailVerified: true, policyVersion: currentPolicyVersion() }));
     } else if (!user.googleSub) {
       // Account pre-hijacking protection: if the existing account never proved
@@ -376,17 +415,30 @@ router.get('/google/callback', async (req, res) => {
       user.googleSub = claims.sub;
       user.emailVerified = true;
       db.save();
+      audit(req, { action: 'GOOGLE_LINKED', entity: `Usuário ${user.id} (mesmo e-mail)`, category: 'security' });
     }
     if (user.status === 'BLOCKED') return fail('account_blocked');
 
     const result = completeLogin(req, res, user, 'google');
     const params = new URLSearchParams();
     if (result.mfaRequired) params.set('mfa', result.challenge);
-    if (stored.invite) params.set('invite', stored.invite);
+    if (flow.invite) params.set('invite', flow.invite);
     res.redirect(`${APP_URL()}/${params.toString() ? `?${params}` : ''}`);
   } catch (err) {
     return fail('oauth_failed', err.message);
   }
+});
+
+// Unlinking needs a password so the account never ends up without a way to sign in.
+router.post('/google/unlink', authenticate, sessionOnly, authLimiter, async (req, res) => {
+  if (!req.user.googleSub) throw badRequest('Nenhuma conta Google vinculada');
+  if (!req.user.passwordHash) throw badRequest('Defina uma senha antes de desvincular o Google, para não perder o acesso à conta');
+  if (!(await bcrypt.compare(String(req.body.password || ''), req.user.passwordHash))) throw badRequest('Senha incorreta');
+  req.user.googleSub = null;
+  db.save();
+  audit(req, { action: 'GOOGLE_UNLINKED', entity: `Usuário ${req.user.id}`, category: 'security' });
+  notify(req.user.id, { event: 'security', title: 'Conta Google desvinculada', description: 'O login com Google foi removido da sua conta.' });
+  res.json({ user: publicUser(req.user) });
 });
 
 // ---------------------------------------------------- account switching

@@ -125,7 +125,7 @@ function resolveSession(token) {
 export function purgeExpiredSessions() {
   const now = Date.now();
   db.remove('sessions', s => Date.parse(s.expiresAt) < now || now - Date.parse(s.lastSeenAt) > IDLE_TIMEOUT_MS);
-  ['passwordResets', 'mfaChallenges', 'emailVerifications'].forEach(c => db.remove(c, r => Date.parse(r.expiresAt) < now));
+  ['passwordResets', 'mfaChallenges', 'emailVerifications', 'oauthStates'].forEach(c => db.remove(c, r => Date.parse(r.expiresAt) < now));
 }
 
 // ---------------------------------------------------------- authentication

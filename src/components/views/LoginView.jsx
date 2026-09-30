@@ -12,7 +12,8 @@ const AUTH_ERRORS = {
   oauth_failed: 'Não foi possível concluir o login com Google. Tente novamente.',
   oauth_unverified: 'Seu e-mail do Google não está verificado.',
   account_blocked: 'Esta conta foi suspensa. Contate o administrador.',
-  signup_disabled: 'Novos cadastros estão desativados neste servidor.'
+  signup_disabled: 'Novos cadastros estão desativados neste servidor.',
+  session_required: 'Entre na sua conta para vincular o Google.'
 };
 
 function GoogleIcon() {

@@ -464,3 +464,17 @@ test('brute force: account locks after repeated failures', async () => {
   const r = await c.post('/auth/login', { email: 'ana.rodrigues@taskly.io', password: 'taskly123' });
   assert.equal(r.status, 401, 'correct password is refused while locked');
 });
+
+test('Google OAuth: forged state, linking without session and unlink rules', async () => {
+  const noRedirect = async (url, headers = {}) => {
+    const res = await fetch(`${BASE}${url}`, { redirect: 'manual', headers });
+    return res.headers.get('location') || '';
+  };
+  assert.match(await noRedirect('/auth/google/start'), /auth_error=google_not_configured/);
+  assert.match(await noRedirect('/auth/google/link'), /auth_error=session_required/);
+  // A forged state cookie cannot complete any flow (state lives server-side).
+  assert.match(await noRedirect('/auth/google/callback?state=abc&code=x', { Cookie: 'taskly_oauth=abc' }), /auth_error=oauth_state/);
+  assert.match(await noRedirect('/auth/google/callback?state=abc&code=x'), /auth_error=oauth_state/);
+  const unlink = await carla.post('/auth/google/unlink', { password: 'nova-senha-123' });
+  assert.equal(unlink.status, 400, 'nothing to unlink');
+});

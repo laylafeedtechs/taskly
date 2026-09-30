@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api, fileToBase64 } from '../../services/api';
 import { useAsync } from '../../lib/hooks';
 import { formatDateTime, timeAgo } from '../../lib/format';
-import { Alert, AsyncBoundary, Avatar, Btn, Field, Icon, Input, Pill } from '../ui';
+import { Alert, AsyncBoundary, Avatar, Btn, Field, Icon, Input, Modal, Pill } from '../ui';
 import { Section, errorText } from './common';
 import { MfaSection, EmailStatusSection } from './MfaSection';
 
@@ -151,6 +151,78 @@ function PasswordForm({ onChanged }) {
   );
 }
 
+const GOOGLE_ERRORS = {
+  google_not_configured: 'O login com Google ainda não foi configurado neste servidor.',
+  google_in_use: 'Essa conta Google já está vinculada a outro usuário do Taskly.',
+  oauth_cancelled: 'O vínculo com o Google foi cancelado.',
+  oauth_state: 'A solicitação expirou. Tente vincular novamente.',
+  oauth_unverified: 'O e-mail dessa conta Google não está verificado.',
+  session_required: 'Sua sessão mudou durante o vínculo. Tente novamente.',
+  link_forbidden: 'Não é possível vincular o Google durante um acesso de suporte.',
+  oauth_failed: 'Não foi possível concluir o vínculo com o Google.'
+};
+
+// Link / unlink a Google account for signing in. The outcome of the Google
+// redirect arrives as ?google=linked or ?auth_error=<code>.
+function GoogleSection() {
+  const { user, setUser, query, setQuery, toast, loadSession, auth } = useApp();
+  const [available, setAvailable] = useState(null);
+  const [unlinking, setUnlinking] = useState(false);
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => { api.auth.providers().then(p => setAvailable(p.google)).catch(() => setAvailable(false)); }, []);
+  useEffect(() => {
+    if (query.google === 'linked') { toast('Conta Google vinculada', 'success'); loadSession(); setQuery({ google: null }); }
+    else if (query.auth_error) { toast(GOOGLE_ERRORS[query.auth_error] || GOOGLE_ERRORS.oauth_failed, 'error'); setQuery({ auth_error: null }); }
+  }, [query.google, query.auth_error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const unlink = async e => {
+    e.preventDefault();
+    setBusy(true); setError('');
+    try {
+      const res = await api.auth.unlinkGoogle(password);
+      setUser(res.user);
+      setUnlinking(false); setPassword('');
+      toast('Conta Google desvinculada', 'success');
+    } catch (err) { setError(errorText(err)); } finally { setBusy(false); }
+  };
+
+  const linked = user.googleLinked;
+  const action = linked
+    ? <Btn variant="danger" onClick={() => setUnlinking(true)}>Desvincular</Btn>
+    : <a href={available && !auth.impersonatedBy ? api.auth.googleLinkUrl() : undefined} aria-disabled={!available}
+        onClick={e => { if (!available) { e.preventDefault(); toast(GOOGLE_ERRORS.google_not_configured, 'warning'); } }}
+        className={`inline-flex items-center gap-2 h-8 px-3 rounded-lg border border-border bg-surface-card text-[12px] font-medium text-text-primary ${available ? 'hover:bg-surface-hover' : 'opacity-60 cursor-not-allowed'}`}>
+        <Icon name="link" size={16} />Vincular conta Google
+      </a>;
+
+  return (
+    <Section title="Conta Google" description="Entre no Taskly com um clique usando sua conta Google." actions={action}>
+      <div className="flex items-center gap-3">
+        <span className="w-9 h-9 rounded-lg bg-surface-elevated border border-border flex items-center justify-center"><Icon name="account_circle" size={18} className="text-text-secondary" /></span>
+        <div className="flex-1 min-w-0">
+          <div className="text-[13px] text-text-primary">{linked ? 'Vinculada' : 'Não vinculada'}</div>
+          <div className="text-[11px] text-text-muted">
+            {linked ? 'Você pode entrar com a conta Google vinculada ou com sua senha.' : available === false ? 'O administrador do servidor ainda não configurou o login com Google.' : 'Você será levado ao Google para escolher a conta. Usamos apenas o identificador, o nome e o e-mail verificado.'}
+          </div>
+        </div>
+        <Pill className={linked ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25' : undefined}>{linked ? 'Ativa' : 'Inativa'}</Pill>
+      </div>
+      {linked && !user.hasPassword && <div className="mt-4"><Alert tone="info">Para desvincular o Google, defina antes uma senha na seção abaixo — assim você não perde o acesso à conta.</Alert></div>}
+      <Modal open={unlinking} onClose={() => setUnlinking(false)} title="Desvincular conta Google" size="sm">
+        <form onSubmit={unlink} className="flex flex-col gap-4">
+          <p className="text-[13px] text-text-secondary">Depois disso, você entrará apenas com e-mail e senha.</p>
+          <Field label="Confirme sua senha" required><Input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" data-autofocus /></Field>
+          {error && <Alert tone="danger">{error}</Alert>}
+          <div className="flex justify-end gap-2"><Btn onClick={() => setUnlinking(false)}>Cancelar</Btn><Btn type="submit" variant="danger" loading={busy} disabled={!password || !user.hasPassword}>Desvincular</Btn></div>
+        </form>
+      </Modal>
+    </Section>
+  );
+}
+
 export function SecuritySection() {
   const { user, confirm, toast, showError } = useApp();
   const { data, loading, error, reload, setData } = useAsync(() => api.auth.sessions(), []);
@@ -215,16 +287,7 @@ export function SecuritySection() {
         </AsyncBoundary>
       </Section>
 
-      <Section title="Conta Google">
-        <div className="flex items-center gap-3">
-          <span className="w-9 h-9 rounded-lg bg-surface-elevated border border-border flex items-center justify-center"><Icon name="account_circle" size={18} className="text-text-secondary" /></span>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] text-text-primary">{user.googleLinked ? 'Conectada' : 'Não conectada'}</div>
-            <div className="text-[11px] text-text-muted">{user.googleLinked ? `Você pode entrar com o Google usando ${user.email}.` : 'Nenhuma conta Google vinculada. Ao entrar com o Google usando este e-mail, ela é vinculada automaticamente.'}</div>
-          </div>
-          <Pill className={user.googleLinked ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/25' : undefined}>{user.googleLinked ? 'Ativa' : 'Inativa'}</Pill>
-        </div>
-      </Section>
+      <GoogleSection />
     </div>
   );
 }
