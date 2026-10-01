@@ -16,13 +16,13 @@
     "run_worker_first": ["/api/*"]
   },
 
-  // Create with:  npx wrangler d1 create taskly
-  // then paste the printed database_id below (it is not a secret).
+  // Created with:  npx wrangler d1 create taskly
+  // The database_id is not a secret.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "taskly",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "6e305d31-b5ec-41f3-af6a-afe9083d2d46",
       "migrations_dir": "migrations"
     }
   ],
