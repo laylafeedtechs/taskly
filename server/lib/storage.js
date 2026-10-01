@@ -4,7 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { DATA_DIR } from '../db.js';
-import { badRequest } from './http.js';
+import { badRequest, HttpError } from './http.js';
+import { IS_WORKER, bindings, background } from './runtime.js';
 
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 
@@ -62,23 +63,46 @@ export function decodeUpload({ name, data }, { allowed, maxBytes }) {
   return { fileName, ext, mime: SIGNATURES[ext].mime, buffer };
 }
 
-export function storeBuffer(folder, buffer, ext) {
-  const dir = path.join(UPLOAD_DIR, folder);
-  fs.mkdirSync(dir, { recursive: true });
+const KEY_RE = /^[a-z]+\/[a-f0-9]{32}\.[a-z0-9]+$/;
+const validKey = key => typeof key === 'string' && KEY_RE.test(key);
+
+function bucket() {
+  const r2 = bindings()?.FILES;
+  if (!r2) throw new HttpError(503, 'O armazenamento de arquivos (R2) não está configurado neste ambiente.', 'STORAGE_NOT_CONFIGURED');
+  return r2;
+}
+
+export async function storeBuffer(folder, buffer, ext, contentType = 'application/octet-stream') {
   const key = `${folder}/${crypto.randomBytes(16).toString('hex')}.${ext}`;
+  if (IS_WORKER) {
+    await bucket().put(key, buffer, { httpMetadata: { contentType } });
+    return key;
+  }
+  fs.mkdirSync(path.join(UPLOAD_DIR, folder), { recursive: true });
   fs.writeFileSync(path.join(UPLOAD_DIR, key), buffer);
   return key;
 }
 
-export function resolveStorageKey(key) {
-  if (!key || !/^[a-z]+\/[a-f0-9]{32}\.[a-z0-9]+$/.test(key)) return null;
+// Returns the stored bytes, or null when the object does not exist.
+export async function readStored(key) {
+  if (!validKey(key)) return null;
+  if (IS_WORKER) {
+    const obj = await bucket().get(key);
+    return obj ? Buffer.from(await obj.arrayBuffer()) : null;
+  }
   const full = path.join(UPLOAD_DIR, key);
-  return fs.existsSync(full) ? full : null;
+  return fs.existsSync(full) ? fs.readFileSync(full) : null;
 }
 
 export function deleteStored(key) {
-  const full = resolveStorageKey(key);
-  if (full) fs.unlinkSync(full);
+  if (!validKey(key)) return;
+  if (IS_WORKER) {
+    const r2 = bindings()?.FILES;
+    if (r2) background(r2.delete(key));
+    return;
+  }
+  const full = path.join(UPLOAD_DIR, key);
+  if (fs.existsSync(full)) fs.unlinkSync(full);
 }
 
 export function formatSize(bytes) {

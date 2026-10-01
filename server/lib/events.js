@@ -7,6 +7,7 @@ import net from 'net';
 import http from 'http';
 import https from 'https';
 import { unseal } from './secrets.js';
+import { IS_WORKER, background, detached } from './runtime.js';
 import { db, newId } from '../db.js';
 import { sendMail } from './mailer.js';
 import { recordEvent } from './observability.js';
@@ -80,13 +81,14 @@ export function notify(userId, { event, title, description, taskId = null, proje
     db.insert('notifications', notification);
   }
   if (email) {
-    sendMail({
+    // Kept alive after the response on Workers (waitUntil).
+    background(sendMail({
       to: user.email,
       subject: `Taskly — ${title}`,
       text: description,
       actionUrl: taskId ? `${APP_URL()}/?task=${encodeURIComponent(taskId)}` : APP_URL(),
       actionLabel: taskId ? 'Abrir tarefa' : 'Abrir Taskly'
-    }).catch(() => {});
+    }));
   }
   return notification;
 }
@@ -283,6 +285,14 @@ export async function assertSafeWebhookUrl(rawUrl) {
   if (process.env.NODE_ENV === 'production' && url.protocol !== 'https:') throw new Error('Em produção, webhooks exigem HTTPS');
   if (allowPrivate()) return url;
   const host = url.hostname.replace(/^\[|\]$/g, '');
+  // On Workers, outbound fetch runs on Cloudflare's network, which cannot
+  // reach the operator's private networks, and Node's DNS resolution is not
+  // available — so names are checked syntactically and IP literals by range.
+  if (IS_WORKER) {
+    if (/^(localhost|.*\.(localhost|local|internal|lan|home|corp))$/i.test(host)) throw new Error('Endereços internos/privados não são permitidos');
+    if (net.isIP(host) && isPrivateAddress(host)) throw new Error('Endereços internos/privados não são permitidos');
+    return url;
+  }
   const addresses = net.isIP(host) ? [host] : (await dns.lookup(host, { all: true }).catch(() => [])).map(a => a.address);
   if (addresses.length === 0) throw new Error('Não foi possível resolver o host do webhook');
   if (addresses.some(isPrivateAddress)) throw new Error('Endereços internos/privados não são permitidos');
@@ -330,7 +340,9 @@ function webhookData(event) {
   return p;
 }
 
-export async function deliverWebhook(hook, eventType, data, { attempt = 1, deliveryId = newId('whd') } = {}) {
+// One HTTP attempt. Touches no stored data, so on Workers it runs outside
+// any D1 transaction.
+async function sendWebhook(hook, eventType, data, deliveryId) {
   const body = JSON.stringify({ id: deliveryId, event: eventType, createdAt: new Date().toISOString(), data });
   const timestamp = Math.floor(Date.now() / 1000).toString();
   const started = Date.now();
@@ -338,23 +350,32 @@ export async function deliverWebhook(hook, eventType, data, { attempt = 1, deliv
   let error = null;
   try {
     await assertSafeWebhookUrl(hook.url);
-    status = await postJson(hook.url, {
+    const headers = {
       'Content-Type': 'application/json',
       'User-Agent': 'Taskly-Webhooks/2.0',
       'X-Taskly-Event': eventType,
       'X-Taskly-Delivery': deliveryId,
       'X-Taskly-Timestamp': timestamp,
       'X-Taskly-Signature': `sha256=${signPayload(unseal(hook.secret), timestamp, body)}`
-    }, body);
+    };
+    // Workers' http.request ignores custom DNS lookups, so it uses fetch there.
+    status = IS_WORKER
+      ? (await fetch(hook.url, { method: 'POST', headers, body, redirect: 'manual', signal: AbortSignal.timeout(8000) })).status
+      : await postJson(hook.url, headers, body);
     if (status < 200 || status >= 300) error = `HTTP ${status}`;
   } catch (err) {
     error = err.message;
   }
+  return { status, error, durationMs: Date.now() - started };
+}
 
+// Stores the attempt's outcome. Returns the record and the retry delay (ms),
+// or null when no further attempt is due.
+function recordDelivery(hook, eventType, deliveryId, attempt, { status, error, durationMs }) {
   const success = !error;
   const record = {
     id: newId('whlog'), webhookId: hook.id, workspaceId: hook.workspaceId, deliveryId, event: eventType,
-    attempt, statusCode: status, success, error, durationMs: Date.now() - started, createdAt: new Date().toISOString()
+    attempt, statusCode: status, success, error, durationMs, createdAt: new Date().toISOString()
   };
   const deliveries = db.get('webhookDeliveries');
   deliveries.unshift(record);
@@ -364,18 +385,42 @@ export async function deliverWebhook(hook, eventType, data, { attempt = 1, deliv
   db.save();
 
   const policy = hook.retryPolicy || { maxAttempts: 3, backoffSeconds: 5 };
-  if (!success) {
-    if (attempt < policy.maxAttempts) {
-      const delay = policy.backoffSeconds * 1000 * 2 ** (attempt - 1);
-      setTimeout(() => {
-        const current = db.find('webhooks', w => w.id === hook.id);
-        if (current?.active) deliverWebhook(current, eventType, data, { attempt: attempt + 1, deliveryId });
-      }, delay).unref();
-    } else {
-      recordEvent('webhook.failed', `Webhook "${hook.name}" falhou após ${attempt} tentativa(s)`, { webhookId: hook.id, error }, 'error');
-    }
+  if (success) return { record, retryIn: null };
+  if (attempt < policy.maxAttempts) return { record, retryIn: policy.backoffSeconds * 1000 * 2 ** (attempt - 1) };
+  recordEvent('webhook.failed', `Webhook "${hook.name}" falhou após ${attempt} tentativa(s)`, { webhookId: hook.id, error }, 'error');
+  return { record, retryIn: null };
+}
+
+const activeHook = id => {
+  const hook = db.find('webhooks', w => w.id === id);
+  return hook?.active ? { ...hook } : null;
+};
+
+export async function deliverWebhook(hook, eventType, data, { attempt = 1, deliveryId = newId('whd') } = {}) {
+  const result = await sendWebhook(hook, eventType, data, deliveryId);
+  const { record, retryIn } = recordDelivery(hook, eventType, deliveryId, attempt, result);
+  if (retryIn !== null) {
+    setTimeout(() => {
+      const current = activeHook(hook.id);
+      if (current) deliverWebhook(current, eventType, data, { attempt: attempt + 1, deliveryId });
+    }, retryIn).unref?.();
   }
   return record;
+}
+
+// Workers: each step that reads or writes data is its own short D1
+// transaction (detached); the HTTP call and the back-off wait happen between
+// them. Background work lives ~30 s after the response, so waits are capped.
+async function deliverWebhookDetached(hookId, eventType, data) {
+  const deliveryId = newId('whd');
+  for (let attempt = 1; ; attempt++) {
+    const hook = await detached(() => activeHook(hookId));
+    if (!hook) return;
+    const result = await sendWebhook(hook, eventType, data, deliveryId);
+    const outcome = await detached(() => recordDelivery(hook, eventType, deliveryId, attempt, result));
+    if (!outcome || outcome.retryIn === null) return;
+    await new Promise(r => setTimeout(r, Math.min(outcome.retryIn, 10000)));
+  }
 }
 
 function dispatchWebhooks(event) {
@@ -383,7 +428,10 @@ function dispatchWebhooks(event) {
   if (!WEBHOOK_EVENTS.includes(hookEvent)) return;
   const data = webhookData({ ...event, webhookEvent: hookEvent });
   db.filter('webhooks', w => w.workspaceId === event.workspaceId && w.active && w.events.includes(hookEvent))
-    .forEach(hook => { deliverWebhook(hook, hookEvent, data); });
+    .forEach(hook => {
+      if (IS_WORKER) background(deliverWebhookDetached(hook.id, hookEvent, data));
+      else deliverWebhook(hook, hookEvent, data);
+    });
 }
 
 // --------------------------------------------------------------------- emit

@@ -48,6 +48,12 @@ jobs:
       - name: Tests
         run: npm test
 
+      # The same flows inside workerd with a local D1 (no Cloudflare account needed).
+      - name: Worker tests (Cloudflare runtime)
+        run: |
+          printf 'TASKLY_ENCRYPTION_KEY=%s\n' "$(node -e "console.log(require('crypto').randomBytes(32).toString('base64'))")" > .dev.vars
+          npm run test:worker
+
   codeql:
     runs-on: ubuntu-latest
     permissions:

@@ -4,7 +4,8 @@ Gerenciamento de projetos e tarefas com Kanban, calendário, timeline, relatóri
 
 - **Frontend:** React 19 + Vite + Tailwind (`src/`)
 - **Backend:** Node.js + Express 5 (`server/`)
-- **Banco:** arquivo JSON transacional em `data/taskly_db.json` (criado e migrado automaticamente)
+- **Banco:** Cloudflare D1 em produção; arquivo JSON transacional em `data/taskly_db.json` no Node (desenvolvimento / auto-hospedagem)
+- **Produção:** Cloudflare Workers — frontend em Static Assets, API Express no Worker, D1, R2 e Cron. Veja [docs/cloudflare.md](docs/cloudflare.md).
 
 ## Rodando localmente
 
@@ -23,10 +24,20 @@ npm run build
 NODE_ENV=production APP_URL=https://seu-dominio npm start   # serve API + frontend compilado
 ```
 
+### Cloudflare Workers (produção)
+
+```bash
+npm run dev:worker   # build + D1 local + wrangler dev em http://localhost:8787
+npm run deploy       # migrations remotas + wrangler deploy
+```
+
+Primeira configuração (D1, segredos, R2, importação de dados): [docs/cloudflare.md](docs/cloudflare.md).
+
 ### Testes
 
 ```bash
-npm test   # testes de integração da API (sobe o servidor com um banco temporário)
+npm test             # testes de integração da API no Node (banco temporário)
+npm run test:worker  # os mesmos fluxos dentro do workerd com D1 local
 ```
 
 ## Configuração
@@ -36,13 +47,14 @@ Copie `.env.example` para `.env`. Tudo é opcional em desenvolvimento.
 | Recurso | Variáveis | Sem configuração |
 | --- | --- | --- |
 | Login com Google (OAuth 2.0 / OIDC, PKCE) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` — redirect URI `APP_URL/api/auth/google/callback` | Botão desabilitado com aviso |
-| E-mail (convites, redefinição de senha, notificações) | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | E-mails gravados em `data/outbox/`; links de convite exibidos na interface |
+| E-mail (convites, redefinição de senha, notificações) | Node: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` · Worker: `RESEND_API_KEY`, `MAIL_FROM` | E-mails gravados em `data/outbox/`; links de convite exibidos na interface |
 | URLs públicas, CORS | `APP_URL`, `CORS_ORIGINS` | `http://localhost:3000` |
 
 ## Administração pelo console
 
 ```bash
 npm run admin:grant -- pessoa@empresa.com    # conceder Super Admin (servidor parado)
+npm run admin:grant -- pessoa@empresa.com --remote   # no D1 de produção
 npm run admin:revoke -- pessoa@empresa.com   # remover Super Admin
 npm run backup:restore                       # listar backups cifrados
 npm run backup:restore -- <arquivo>          # restaurar (servidor parado)

@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../lib/password.js';
 import { db, newId } from '../db.js';
 import { authenticate, sessionOnly, requireSuperAdmin, publicUser, revokeUserSessions, accessibleWorkspaces, randomToken, sha256, rateLimit } from '../middleware/auth.js';
 import { v, badRequest, notFound, paginate } from '../lib/http.js';
@@ -77,7 +77,7 @@ router.post('/users', async (req, res) => {
   if (db.find('users', u => u.email.toLowerCase() === email)) throw badRequest('E-mail já em uso');
   // No default password: either the admin sets one, or the user receives a set-password link.
   const password = req.body.password ? v.password(req.body.password) : null;
-  const { user } = createUserWithWorkspace({ name, email, passwordHash: password ? await bcrypt.hash(password, 12) : null });
+  const { user } = createUserWithWorkspace({ name, email, passwordHash: password ? await hashPassword(password) : null });
   user.onboardingCompleted = false;
   let setupLink;
   if (!password) {

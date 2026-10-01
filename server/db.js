@@ -3,17 +3,23 @@ import path from 'path';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { fileURLToPath } from 'url';
+import { AsyncLocalStorage } from 'async_hooks';
 import { seal, unseal } from './lib/secrets.js';
 import { hashAuditEntry } from './lib/auditHash.js';
+import { IS_WORKER } from './lib/runtime.js';
 
-export const DATA_DIR = process.env.TASKLY_DATA_DIR
-  ? path.resolve(process.env.TASKLY_DATA_DIR)
-  : path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'data');
+// Persistence backends:
+//  - Node (development / self-hosting): a JSON file in DATA_DIR.
+//  - Cloudflare Worker: D1. Each request runs inside a context (see
+//    server/lib/d1store.js) that holds the state loaded from D1; changes are
+//    written back in one atomic batch. The file is never used in the Worker.
+function defaultDataDir() {
+  try { return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'data'); } catch { return '/tmp/taskly-data'; }
+}
+export const DATA_DIR = process.env.TASKLY_DATA_DIR ? path.resolve(process.env.TASKLY_DATA_DIR) : defaultDataDir();
 const DB_FILE = path.join(DATA_DIR, 'taskly_db.json');
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
+export const requestStore = new AsyncLocalStorage();
 
 // Initial default seed dataset
 const defaultData = {
@@ -885,18 +891,43 @@ function migrateV3(data) {
 // Demo accounts (with a publicly known password) are only seeded outside
 // production. A production database starts with no users; the first Super
 // Admin is granted from the console (npm run admin:grant).
-function initialData() {
+export function initialData() {
   const seed = JSON.parse(JSON.stringify(defaultData));
   if (process.env.NODE_ENV !== 'production' && process.env.TASKLY_DEMO_SEED !== 'false') return seed;
   return { projectTemplates: seed.projectTemplates, featureFlags: seed.featureFlags };
 }
 
+// Brings any dataset (fresh, file or D1) to the current schema.
+export function prepareData(data) {
+  return migrate(data);
+}
+
 class Database {
   constructor() {
-    this.init();
+    this._data = null;
+    this._inTransaction = false;
+  }
+
+  // Inside a Worker request the state belongs to that request; otherwise
+  // (Node) it is the file-backed dataset, loaded on first use.
+  get data() {
+    const store = requestStore.getStore();
+    if (store) return store.data;
+    // There is no filesystem dataset on Workers: every access must run inside
+    // a D1 store (request middleware, withD1Store or detached()).
+    if (IS_WORKER) throw new Error('Acesso ao banco fora de um contexto D1');
+    if (!this._data) this.init();
+    return this._data;
+  }
+
+  set data(value) {
+    const store = requestStore.getStore();
+    if (store) store.data = value;
+    else this._data = value;
   }
 
   init() {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
     if (!fs.existsSync(DB_FILE)) {
       this.data = initialData();
     } else {
@@ -914,6 +945,8 @@ class Database {
   }
 
   save() {
+    const store = requestStore.getStore();
+    if (store) { store.dirty = true; return; } // flushed to D1 at the end of the request
     if (this._inTransaction) return;
     const tempPath = `${DB_FILE}.tmp`;
     fs.writeFileSync(tempPath, JSON.stringify(this.data, null, 2), 'utf8');
@@ -921,6 +954,7 @@ class Database {
   }
 
   // Runs fn atomically: either every change is persisted, or none are.
+  // `fn` is synchronous, so concurrent Worker requests cannot interleave inside it.
   transaction(fn) {
     const snapshot = JSON.stringify(this.data);
     this._inTransaction = true;

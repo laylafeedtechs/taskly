@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { IS_WORKER } from './runtime.js';
 
 const PREFIX = 'enc:v1:';
 let key = null;
@@ -21,6 +22,12 @@ function loadKey() {
     key = Buffer.from(process.env.TASKLY_ENCRYPTION_KEY, 'base64');
     if (key.length !== 32) throw new Error('TASKLY_ENCRYPTION_KEY must be 32 bytes encoded in base64');
     return key;
+  }
+  // A Worker has no persistent disk: the key must come from a Cloudflare secret.
+  if (IS_WORKER) {
+    const err = new Error('TASKLY_ENCRYPTION_KEY não configurada (wrangler secret put TASKLY_ENCRYPTION_KEY)');
+    err.status = 503; err.expose = true; err.code = 'ENCRYPTION_KEY_MISSING';
+    throw err;
   }
   const dir = process.env.TASKLY_KEY_DIR ? path.resolve(process.env.TASKLY_KEY_DIR) : path.join(os.homedir(), '.taskly');
   const file = path.join(dir, 'encryption.key');

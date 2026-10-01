@@ -1,6 +1,6 @@
 // Privacy Center: data-subject rights (LGPD art. 18) and the public policy.
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import { verifyPassword } from '../lib/password.js';
 import * as OTPAuth from 'otpauth';
 import { db, newId } from '../db.js';
 import { authenticate, sessionOnly, destroySession, rateLimit, publicUser, accessibleWorkspaces } from '../middleware/auth.js';
@@ -100,7 +100,7 @@ router.delete('/me/account', rateLimit({ windowMs: 60 * 60 * 1000, max: 5, key: 
   const user = req.user;
   if (req.session.impersonatorId) throw forbidden('A exclusão de conta não pode ser feita em um acesso de suporte');
   if (req.body.confirmEmail?.toLowerCase() !== user.email.toLowerCase()) throw badRequest('Digite seu e-mail para confirmar');
-  if (user.passwordHash && !(await bcrypt.compare(String(req.body.password || ''), user.passwordHash))) throw badRequest('Senha incorreta');
+  if (user.passwordHash && !(await verifyPassword(String(req.body.password || ''), user.passwordHash))) throw badRequest('Senha incorreta');
   if (user.mfa?.enabled) {
     const totp = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(unseal(user.mfa.secret)), digits: 6, period: 30 });
     if (totp.validate({ token: String(req.body.code || ''), window: 1 }) === null) throw badRequest('Código de verificação inválido');

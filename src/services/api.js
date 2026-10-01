@@ -11,7 +11,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request(endpoint, { method = 'GET', body, query, raw = false, signal } = {}) {
+async function request(endpoint, { method = 'GET', body, query, raw = false, signal, attempt = 1 } = {}) {
   const qs = query ? `?${new URLSearchParams(Object.entries(query).filter(([, v]) => v !== undefined && v !== null && v !== '' && !(Array.isArray(v) && !v.length)).map(([k, v]) => [k, Array.isArray(v) ? v.join(',') : String(v)]))}` : '';
   let res;
   try {
@@ -33,6 +33,12 @@ async function request(endpoint, { method = 'GET', body, query, raw = false, sig
   if (!res.ok) {
     let data = {};
     try { data = await res.json(); } catch { /* non-JSON error */ }
+    // Another request changed the data at the same moment; the server rolled
+    // this one back entirely, so it is safe to send it again.
+    if (res.status === 409 && data.code === 'DB_CONFLICT' && attempt < 4) {
+      await new Promise(r => setTimeout(r, 120 * attempt + Math.random() * 120));
+      return request(endpoint, { method, body, query, raw, signal, attempt: attempt + 1 });
+    }
     const error = new ApiError(res.status, data.error || `Erro ${res.status}`, data.code, data.details);
     if (res.status === 401 && !endpoint.startsWith('/auth/login')) window.dispatchEvent(new CustomEvent('taskly:unauthorized'));
     throw error;

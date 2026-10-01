@@ -221,6 +221,7 @@ export function rateLimit({ windowMs, max, key = req => req.ip, message = 'Muita
   return (req, res, next) => {
     const k = `${windowMs}:${max}:${key(req)}`;
     const now = Date.now();
+    sweepBuckets(now);
     let b = buckets.get(k);
     if (!b || b.reset < now) { b = { count: 0, reset: now + windowMs }; buckets.set(k, b); }
     b.count += 1;
@@ -232,10 +233,14 @@ export function rateLimit({ windowMs, max, key = req => req.ip, message = 'Muita
     next();
   };
 }
-setInterval(() => {
-  const now = Date.now();
+// Expired buckets are swept lazily (no timers: Workers forbid them at module
+// scope). Note: on Workers these counters are per isolate, not global.
+let lastSweep = 0;
+function sweepBuckets(now) {
+  if (now - lastSweep < 60000) return;
+  lastSweep = now;
   for (const [k, b] of buckets) if (b.reset < now) buckets.delete(k);
-}, 60000).unref();
+}
 
 // ----------------------------------------------- workspace & resource access
 

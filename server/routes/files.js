@@ -4,7 +4,7 @@ import { authenticate, resource, loadResource } from '../middleware/auth.js';
 import { v, badRequest, notFound, HttpError } from '../lib/http.js';
 import { audit } from '../lib/observability.js';
 import { recordActivity } from '../lib/events.js';
-import { decodeUpload, storeBuffer, resolveStorageKey, PREVIEWABLE, formatSize, extensionOf, sanitizeFileName } from '../lib/storage.js';
+import { decodeUpload, storeBuffer, readStored, PREVIEWABLE, formatSize, extensionOf, sanitizeFileName } from '../lib/storage.js';
 
 const router = express.Router();
 const ALLOWED = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'pdf', 'zip', 'docx', 'xlsx', 'pptx', 'txt', 'md', 'csv', 'json'];
@@ -27,12 +27,12 @@ router.get('/project/:id', authenticate, resource('projects', 'project.view'), (
 
 // Upload: JSON body { name, data (base64), taskId? }. Content is validated
 // against the extension by magic bytes before anything is written to disk.
-router.post('/project/:id', authenticate, express.json({ limit: '36mb' }), resource('projects', 'files.upload'), (req, res) => {
+router.post('/project/:id', authenticate, express.json({ limit: '36mb' }), resource('projects', 'files.upload'), async (req, res) => {
   const project = req.resource;
   const taskId = req.body.taskId || null;
   if (taskId && !db.find('tasks', t => t.id === taskId && t.projectId === project.id && !t.deletedAt)) throw badRequest('Tarefa inválida para este projeto');
   const file = decodeUpload(req.body, { allowed: ALLOWED, maxBytes: MAX_BYTES });
-  const storageKey = storeBuffer('files', file.buffer, file.ext);
+  const storageKey = await storeBuffer('files', file.buffer, file.ext, file.mime);
   const record = {
     id: newId('file'), projectId: project.id, workspaceId: project.workspaceId, taskId,
     name: file.fileName, size: file.buffer.length, formattedSize: formatSize(file.buffer.length), mimeType: file.mime,
@@ -44,10 +44,10 @@ router.post('/project/:id', authenticate, express.json({ limit: '36mb' }), resou
   res.status(201).json({ file: present(record) });
 });
 
-function sendStored(req, res, inline) {
+async function sendStored(req, res, inline) {
   const file = req.resource;
-  const full = resolveStorageKey(file.storageKey);
-  if (!full) throw new HttpError(410, 'O conteúdo deste arquivo não está disponível (registro de demonstração)', 'GONE');
+  const content = await readStored(file.storageKey);
+  if (!content) throw new HttpError(410, 'O conteúdo deste arquivo não está disponível (registro de demonstração)', 'GONE');
   const canInline = inline && PREVIEWABLE.includes(file.mimeType);
   res.setHeader('Content-Type', file.mimeType);
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -55,7 +55,7 @@ function sendStored(req, res, inline) {
   res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox");
   res.setHeader('Content-Disposition', `${canInline ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(file.name)}`);
   res.setHeader('Cache-Control', 'private, no-store');
-  res.sendFile(full);
+  res.send(content);
 }
 
 router.get('/:id/download', authenticate, resource('files', 'project.view'), (req, res) => sendStored(req, res, false));

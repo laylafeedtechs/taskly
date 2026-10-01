@@ -1,27 +1,44 @@
-// Outgoing e-mail. With SMTP_* configured, mail is delivered through SMTP.
-// Without it (local development), messages are written to data/outbox so
-// links such as password resets and invitations can still be followed.
+// Outgoing e-mail.
+//  - Cloudflare Worker: HTTP API (Resend) when RESEND_API_KEY is set — raw
+//    SMTP sockets are not a supported way to send mail from Workers.
+//  - Node: SMTP via nodemailer when SMTP_HOST is set.
+//  - Otherwise nothing is sent: on Node messages are written to data/outbox
+//    (development), on the Worker they are only logged without content, and
+//    callers fall back to showing links (e.g. invitations) in the UI.
 import fs from 'fs';
 import path from 'path';
-import nodemailer from 'nodemailer';
 import { DATA_DIR } from '../db.js';
 import { log, recordEvent } from './observability.js';
+import { IS_WORKER, detached } from './runtime.js';
 
 const OUTBOX = path.join(DATA_DIR, 'outbox');
+const FROM = () => process.env.MAIL_FROM || process.env.SMTP_FROM || 'Taskly <no-reply@taskly.local>';
 
-let transport = null;
-if (process.env.SMTP_HOST) {
-  transport = nodemailer.createTransport({
+export const mailConfigured = () => Boolean(IS_WORKER ? process.env.RESEND_API_KEY : process.env.SMTP_HOST);
+
+let transportPromise = null;
+function smtpTransport() {
+  // Loaded lazily so the Worker bundle never initializes an SMTP client.
+  transportPromise ||= import('nodemailer').then(({ default: nodemailer }) => nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT || 587),
     secure: process.env.SMTP_SECURE === 'true',
     auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined
-  });
+  }));
+  return transportPromise;
 }
 
-export const mailConfigured = () => Boolean(transport);
-
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+async function sendViaResend({ to, subject, text, html }) {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: FROM(), to: [to], subject, text, html }),
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!res.ok) throw new Error(`Resend HTTP ${res.status}`);
+}
 
 export async function sendMail({ to, subject, text, actionUrl, actionLabel }) {
   const html = `<div style="font-family:Inter,Arial,sans-serif;background:#0D0D0D;color:#F5F5F5;padding:32px">
@@ -31,16 +48,24 @@ export async function sendMail({ to, subject, text, actionUrl, actionLabel }) {
   </div>`;
   const body = actionUrl ? `${text}\n\n${actionLabel || 'Abrir'}: ${actionUrl}` : text;
 
-  if (transport) {
+  if (mailConfigured()) {
     try {
-      await transport.sendMail({ from: process.env.SMTP_FROM || 'Taskly <no-reply@taskly.local>', to, subject, text: body, html });
+      if (IS_WORKER) await sendViaResend({ to, subject, text: body, html });
+      else await (await smtpTransport()).sendMail({ from: FROM(), to, subject, text: body, html });
       return { delivered: true };
     } catch (err) {
-      recordEvent('email.failed', `Falha ao enviar e-mail: ${subject}`, { to, error: err.message }, 'error');
+      // On Workers this runs after the response, so it needs its own D1 store.
+      const record = () => recordEvent('email.failed', `Falha ao enviar e-mail: ${subject}`, { to, error: err.message }, 'error');
+      if (IS_WORKER) detached(record); else record();
       return { delivered: false, error: 'Falha no envio de e-mail' };
     }
   }
 
+  if (IS_WORKER) {
+    // Never log the body: it may contain single-use links.
+    log('warn', 'E-mail não enviado: RESEND_API_KEY não configurada', { subject });
+    return { delivered: false };
+  }
   fs.mkdirSync(OUTBOX, { recursive: true });
   const file = path.join(OUTBOX, `${Date.now()}-${subject.replace(/[^a-z0-9]+/gi, '-').slice(0, 40)}.txt`);
   fs.writeFileSync(file, `To: ${to}\nSubject: ${subject}\n\n${body}\n`, 'utf8');

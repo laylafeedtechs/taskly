@@ -2,7 +2,7 @@
 // TOTP is implemented by the `otpauth` library; the shared secret is stored
 // encrypted at rest (lib/secrets.js) and recovery codes only as hashes.
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import { verifyPassword } from '../lib/password.js';
 import crypto from 'crypto';
 import * as OTPAuth from 'otpauth';
 import QRCode from 'qrcode';
@@ -12,8 +12,17 @@ import { v, badRequest, unauthorized } from '../lib/http.js';
 import { audit } from '../lib/observability.js';
 import { notify } from '../lib/events.js';
 import { seal, unseal } from '../lib/secrets.js';
+import { IS_WORKER } from '../lib/runtime.js';
 
 const router = express.Router();
+
+// Workers get qrcode's browser build, which renders PNGs through a canvas;
+// SVG needs none and displays the same in an <img>.
+async function qrDataUrl(text) {
+  if (!IS_WORKER) return QRCode.toDataURL(text, { margin: 1, width: 220 });
+  const svg = await QRCode.toString(text, { type: 'svg', margin: 1, width: 220 });
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+}
 const ISSUER = 'Taskly';
 
 const totpFor = (user, secret) => new OTPAuth.TOTP({ issuer: ISSUER, label: user.email, algorithm: 'SHA1', digits: 6, period: 30, secret: OTPAuth.Secret.fromBase32(secret) });
@@ -75,7 +84,7 @@ router.post('/verify', verifyLimiter, (req, res) => {
 router.use(authenticate, sessionOnly);
 
 async function confirmIdentity(req) {
-  if (req.user.passwordHash && !(await bcrypt.compare(String(req.body.password || ''), req.user.passwordHash))) {
+  if (req.user.passwordHash && !(await verifyPassword(String(req.body.password || ''), req.user.passwordHash))) {
     audit(req, { action: 'MFA_CHANGE_DENIED', entity: 'Senha incorreta', result: 'FAILED', category: 'security' });
     throw badRequest('Senha atual incorreta');
   }
@@ -89,7 +98,7 @@ router.post('/setup', async (req, res) => {
   req.user.mfa = { ...(req.user.mfa || {}), pendingSecret: seal(secret), pendingAt: new Date().toISOString() };
   db.save();
   const uri = totpFor(req.user, secret).toString();
-  res.json({ otpauthUrl: uri, qrCode: await QRCode.toDataURL(uri, { margin: 1, width: 220 }), secret });
+  res.json({ otpauthUrl: uri, qrCode: await qrDataUrl(uri), secret });
 });
 
 router.post('/enable', async (req, res) => {

@@ -10,6 +10,7 @@ import { db, DATA_DIR } from '../db.js';
 import { encryptBuffer, decryptBuffer } from './secrets.js';
 import { recordEvent } from './observability.js';
 import { retentionSettings } from './retention.js';
+import { IS_WORKER } from './runtime.js';
 
 export const BACKUP_DIR = process.env.TASKLY_BACKUP_DIR
   ? path.resolve(process.env.TASKLY_BACKUP_DIR)
@@ -28,7 +29,13 @@ export function decryptBackupFile(file) {
   return JSON.parse(decryptBuffer(blob.subarray(MAGIC.length)).toString('utf8'));
 }
 
+// On Cloudflare the database is D1, whose Time Travel keeps point-in-time
+// restores for 30 days (wrangler d1 time-travel restore). File backups only
+// apply to the Node deployment.
+export const WORKER_BACKUP_NOTE = 'Banco no Cloudflare D1: backups contínuos pelo D1 Time Travel (restauração dos últimos 30 dias com "wrangler d1 time-travel restore").';
+
 export function listBackups() {
+  if (IS_WORKER) return [];
   if (!fs.existsSync(BACKUP_DIR)) return [];
   return fs.readdirSync(BACKUP_DIR).filter(f => /^taskly-\d{8}-\d{6}\.bak$/.test(f)).sort().reverse()
     .map(name => ({ name, size: fs.statSync(path.join(BACKUP_DIR, name)).size, createdAt: fs.statSync(path.join(BACKUP_DIR, name)).mtime.toISOString() }));
@@ -37,6 +44,7 @@ export function listBackups() {
 export function runBackup(reason = 'scheduled') {
   const started = Date.now();
   const status = { at: new Date().toISOString(), reason, ok: false, file: null, verified: false, error: null };
+  if (IS_WORKER) return { ...status, ok: true, verified: true, managed: true, file: 'D1 Time Travel', error: null, note: WORKER_BACKUP_NOTE };
   try {
     ensureDir();
     const plain = Buffer.from(JSON.stringify(db.data), 'utf8');

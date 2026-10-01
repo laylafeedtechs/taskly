@@ -9,3 +9,7 @@ backend/prisma/dev.db-journal
 
 # Local database, uploads, outbox and backups
 data/
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars

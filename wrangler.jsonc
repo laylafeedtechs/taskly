@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "taskly",
+  "main": "worker/index.js",
+  // httpServerHandler (Express on Workers) needs nodejs_compat and a date
+  // >= 2025-09-01, which also enables the node:http server modules.
+  "compatibility_date": "2026-09-25",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Frontend (Vite build) served by Static Assets. Only /api/* runs the
+  // Worker first; everything else is a static file or the SPA index.html.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Create with:  npx wrangler d1 create taskly
+  // then paste the printed database_id below (it is not a secret).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "taskly",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // File uploads and avatars (optional). Enable R2 in the dashboard, run
+  //   npx wrangler r2 bucket create taskly-files
+  // and uncomment this block. Without it, uploads answer 503 with a clear message.
+  // "r2_buckets": [{ "binding": "FILES", "bucket_name": "taskly-files" }],
+
+  // Replaces the Node timers: hourly maintenance; retention runs at 03:00 UTC.
+  "triggers": { "crons": ["0 * * * *"] },
+
+  // Non-secret configuration. Secrets go through `wrangler secret put`.
+  "vars": {
+    "NODE_ENV": "production",
+    "APP_URL": "https://taskly.layla-figueiredo.workers.dev",
+    "HOSTING_PROVIDER": "Cloudflare (Workers, D1) — rede global, pode envolver transferência internacional"
+  },
+
+  "observability": { "enabled": true }
+}

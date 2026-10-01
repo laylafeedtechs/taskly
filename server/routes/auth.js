@@ -1,5 +1,5 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword, verifyPassword, needsRehash, DUMMY_HASH } from '../lib/password.js';
 import crypto from 'crypto';
 import { db, newId } from '../db.js';
 import {
@@ -10,13 +10,11 @@ import { v, badRequest, unauthorized, forbidden, notFound } from '../lib/http.js
 import { audit, recordEvent } from '../lib/observability.js';
 import { sendMail } from '../lib/mailer.js';
 import { notify } from '../lib/events.js';
-import { decodeUpload, storeBuffer, deleteStored, resolveStorageKey } from '../lib/storage.js';
+import { decodeUpload, storeBuffer, deleteStored, readStored } from '../lib/storage.js';
 
 const router = express.Router();
 const APP_URL = () => process.env.APP_URL || 'http://localhost:3000';
 const isProd = process.env.NODE_ENV === 'production';
-// Constant-time-ish comparison target so unknown e-mails cost the same as wrong passwords.
-const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', 10);
 
 const WIDGETS = ['metrics', 'my-tasks', 'upcoming', 'overdue', 'projects', 'activity', 'calendar', 'reports', 'notifications'];
 const DEFAULT_LAYOUT = ['metrics', 'my-tasks', 'upcoming', 'activity', 'projects'];
@@ -130,7 +128,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     audit(req, { action: 'LOGIN_FAILED', entity: 'Conta temporariamente bloqueada', result: 'FAILED', category: 'auth' });
     throw unauthorized('Muitas tentativas. Aguarde alguns minutos ou redefina sua senha.');
   }
-  const ok = await bcrypt.compare(password, user?.passwordHash || DUMMY_HASH);
+  const ok = await verifyPassword(password, user?.passwordHash || DUMMY_HASH);
 
   if (!user || !user.passwordHash || !ok) {
     registerFailure(user);
@@ -143,6 +141,8 @@ router.post('/login', loginLimiter, async (req, res) => {
     audit(req, { action: 'LOGIN_BLOCKED_ACCOUNT', entity: 'Autenticação', result: 'BLOCKED', category: 'auth' });
     throw forbidden('Esta conta foi suspensa. Contate o administrador.');
   }
+  // Upgrades hashes created by another runtime (e.g. bcrypt → PBKDF2 on Workers).
+  if (needsRehash(user.passwordHash)) { user.passwordHash = await hashPassword(password); db.save(); }
   res.json(completeLogin(req, res, user, 'password'));
 });
 
@@ -154,7 +154,7 @@ router.post('/signup', authLimiter, async (req, res) => {
   if (req.body.acceptPolicy !== true) throw badRequest('Declare que leu a Política de Privacidade para continuar');
   if (db.find('users', u => u.email.toLowerCase() === email)) throw badRequest('Não foi possível criar a conta com este e-mail. Se ele já é seu, entre ou redefina a senha.');
 
-  const { user, workspace } = createUserWithWorkspace({ name, email, passwordHash: await bcrypt.hash(password, 12), policyVersion: currentPolicyVersion() });
+  const { user, workspace } = createUserWithWorkspace({ name, email, passwordHash: await hashPassword(password), policyVersion: currentPolicyVersion() });
   const mail = await sendVerificationEmail(user);
   createSession(res, req, user);
   req.user = user;
@@ -233,7 +233,7 @@ router.post('/reset-password', authLimiter, async (req, res) => {
   const user = db.find('users', u => u.id === reset.userId);
   if (!user) throw badRequest('Link de redefinição inválido ou expirado');
 
-  const hash = await bcrypt.hash(password, 12);
+  const hash = await hashPassword(password);
   db.transaction(() => {
     user.passwordHash = hash;
     user.emailVerified = true; // the link was delivered to this inbox
@@ -250,13 +250,13 @@ router.post('/reset-password', authLimiter, async (req, res) => {
 router.post('/change-password', authenticate, sessionOnly, async (req, res) => {
   const next = v.password(req.body.newPassword);
   if (req.user.passwordHash) {
-    const ok = await bcrypt.compare(String(req.body.currentPassword || ''), req.user.passwordHash);
+    const ok = await verifyPassword(String(req.body.currentPassword || ''), req.user.passwordHash);
     if (!ok) {
       audit(req, { action: 'PASSWORD_CHANGE_FAILED', entity: `Usuário ${req.user.id}`, result: 'FAILED', category: 'security' });
       throw badRequest('Senha atual incorreta');
     }
   }
-  req.user.passwordHash = await bcrypt.hash(next, 12);
+  req.user.passwordHash = await hashPassword(next);
   revokeUserSessions(req.user.id, req.session.id);
   db.save();
   audit(req, { action: 'PASSWORD_CHANGED', entity: `Usuário ${req.user.id}`, category: 'security' });
@@ -433,7 +433,7 @@ router.get('/google/callback', async (req, res) => {
 router.post('/google/unlink', authenticate, sessionOnly, authLimiter, async (req, res) => {
   if (!req.user.googleSub) throw badRequest('Nenhuma conta Google vinculada');
   if (!req.user.passwordHash) throw badRequest('Defina uma senha antes de desvincular o Google, para não perder o acesso à conta');
-  if (!(await bcrypt.compare(String(req.body.password || ''), req.user.passwordHash))) throw badRequest('Senha incorreta');
+  if (!(await verifyPassword(String(req.body.password || ''), req.user.passwordHash))) throw badRequest('Senha incorreta');
   req.user.googleSub = null;
   db.save();
   audit(req, { action: 'GOOGLE_UNLINKED', entity: `Usuário ${req.user.id}`, category: 'security' });
@@ -499,7 +499,7 @@ router.put('/profile', authenticate, sessionOnly, async (req, res) => {
 
   if (req.body.email !== undefined && req.body.email.toLowerCase() !== req.user.email.toLowerCase()) {
     if (!req.user.passwordHash) throw badRequest('Contas conectadas ao Google não podem alterar o e-mail aqui');
-    if (!(await bcrypt.compare(String(req.body.currentPassword || ''), req.user.passwordHash))) throw badRequest('Confirme sua senha atual para alterar o e-mail');
+    if (!(await verifyPassword(String(req.body.currentPassword || ''), req.user.passwordHash))) throw badRequest('Confirme sua senha atual para alterar o e-mail');
     const email = v.email(req.body.email);
     if (db.find('users', u => u.email.toLowerCase() === email)) throw badRequest('Este e-mail já está em uso');
     const oldEmail = req.user.email;
@@ -528,9 +528,9 @@ router.put('/profile', authenticate, sessionOnly, async (req, res) => {
   res.json({ user: publicUser(updated) });
 });
 
-router.post('/avatar', authenticate, sessionOnly, express.json({ limit: '4mb' }), (req, res) => {
+router.post('/avatar', authenticate, sessionOnly, express.json({ limit: '4mb' }), async (req, res) => {
   const file = decodeUpload(req.body, { allowed: ['png', 'jpg', 'jpeg', 'webp', 'gif'], maxBytes: 2 * 1024 * 1024 });
-  const key = storeBuffer('avatars', file.buffer, file.ext);
+  const key = await storeBuffer('avatars', file.buffer, file.ext, file.mime);
   if (req.user.avatarKey) deleteStored(req.user.avatarKey);
   const updated = db.update('users', u => u.id === req.user.id, { avatarKey: key, avatar: `/api/auth/avatar/${req.user.id}?v=${Date.now()}` });
   audit(req, { action: 'AVATAR_UPDATED', entity: `Usuário ${req.user.id}`, category: 'users' });
@@ -544,14 +544,17 @@ router.delete('/avatar', authenticate, sessionOnly, (req, res) => {
 });
 
 // Avatars are visible to any signed-in user who shares a workspace.
-router.get('/avatar/:userId', authenticate, (req, res) => {
+router.get('/avatar/:userId', authenticate, async (req, res) => {
   const target = db.find('users', u => u.id === req.params.userId);
   const mine = new Set(accessibleWorkspaces(req.user).map(w => w.id));
   const shares = target && (target.id === req.user.id || accessibleWorkspaces(target).some(w => mine.has(w.id)));
-  const full = shares && resolveStorageKey(target.avatarKey);
-  if (!full) throw notFound();
+  const content = shares ? await readStored(target.avatarKey) : null;
+  if (!content) throw notFound();
+  const ext = String(target.avatarKey).split('.').pop();
+  res.setHeader('Content-Type', { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' }[ext] || 'application/octet-stream');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Cache-Control', 'private, max-age=86400');
-  res.sendFile(full);
+  res.send(content);
 });
 
 export { SESSION_COOKIE };
