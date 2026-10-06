@@ -40,6 +40,10 @@ npm test             # testes de integração da API no Node (banco temporário)
 npm run test:worker  # os mesmos fluxos dentro do workerd com D1 local
 ```
 
+## Criativos (Instagram)
+
+Planejamento de feed, calendário editorial, biblioteca de criativos, campanhas, aprovações e publicação agendada pela API oficial da Meta. Arquitetura, configuração externa e limitações: [docs/criativos.md](docs/criativos.md).
+
 ## Configuração
 
 Copie `.env.example` para `.env`. Tudo é opcional em desenvolvimento.

@@ -290,7 +290,12 @@ const OWNER_RESOLVERS = {
   files: f => f.workspaceId,
   milestones: m => db.find('projects', p => p.id === m.projectId)?.workspaceId,
   columns: c => db.find('projects', p => p.id === c.projectId)?.workspaceId,
-  projectTemplates: t => t.workspaceId
+  projectTemplates: t => t.workspaceId,
+  socialAccounts: a => a.workspaceId,
+  socialMedia: m => m.workspaceId,
+  creatives: c => c.workspaceId,
+  campaigns: c => c.workspaceId,
+  publications: p => p.workspaceId
 };
 
 // Loads a resource by id and authorizes the caller against its workspace.

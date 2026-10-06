@@ -32,8 +32,9 @@
   // and uncomment this block. Without it, uploads answer 503 with a clear message.
   // "r2_buckets": [{ "binding": "FILES", "bucket_name": "taskly-files" }],
 
-  // Replaces the Node timers: hourly maintenance; retention runs at 03:00 UTC.
-  "triggers": { "crons": ["0 * * * *"] },
+  // Every minute: publication scheduler (backend-driven). Hourly maintenance
+  // runs at minute 0; retention, token renewal and account sync at 03:00 UTC.
+  "triggers": { "crons": ["* * * * *"] },
 
   // Non-secret configuration. Secrets go through `wrangler secret put`.
   "vars": {

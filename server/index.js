@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 import { db } from './db.js';
 import { createApp } from './app.js';
-import { runHourlyJobs, runDailyJobs } from './jobs.js';
+import { runHourlyJobs, runDailyJobs, runPublicationTick, runSocialDailyJobs } from './jobs.js';
 import { runBackup } from './lib/backup.js';
 import { log, recordEvent } from './lib/observability.js';
 
@@ -38,6 +38,9 @@ const app = createApp({ beforeErrors: serveFrontend });
 // Background jobs.
 setInterval(runHourlyJobs, 60 * 60 * 1000).unref();
 setInterval(runDailyJobs, 24 * 60 * 60 * 1000).unref();
+// Publication scheduler (backend-driven: runs whether or not anyone has Taskly open).
+setInterval(runPublicationTick, Number(process.env.TASKLY_SCHEDULER_INTERVAL_MS) || 60 * 1000).unref();
+setInterval(runSocialDailyJobs, 24 * 60 * 60 * 1000).unref();
 setInterval(() => runBackup('scheduled'), 24 * 60 * 60 * 1000).unref();
 setTimeout(() => {
   runHourlyJobs();

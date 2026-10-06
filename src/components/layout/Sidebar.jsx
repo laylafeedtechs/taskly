@@ -15,6 +15,9 @@ const NAV = [
     { path: '/calendar', route: 'calendar', label: 'Calendário', icon: 'calendar_month' },
     { path: '/timeline', route: 'timeline', label: 'Timeline', icon: 'view_timeline' }
   ] },
+  { section: 'Criativos', items: [
+    { path: '/creatives', route: 'creatives', label: 'Criativos', icon: 'photo_library', permission: 'creatives.view' }
+  ] },
   { section: 'Análise', items: [
     { path: '/reports', route: 'reports', label: 'Relatórios', icon: 'bar_chart' },
     { path: '/activity', route: 'activity', label: 'Atividade', icon: 'history' }
@@ -86,7 +89,7 @@ function WorkspaceSwitcher() {
 }
 
 export function Sidebar() {
-  const { route, navigate, unreadCount, user, favorites, currentWorkspaceId, switchWorkspace, openQuickCreate, setPaletteOpen, sidebarOpen, setSidebarOpen, params } = useApp();
+  const { route, navigate, unreadCount, user, favorites, currentWorkspaceId, switchWorkspace, openQuickCreate, setPaletteOpen, sidebarOpen, setSidebarOpen, params, can } = useApp();
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => { setSidebarOpen(false); }, [route, params.id, setSidebarOpen]);
@@ -138,7 +141,7 @@ export function Sidebar() {
         )}
 
         <nav aria-label="Navegação principal" className="flex flex-col gap-3.5">
-          {[...NAV, ...(user?.isSuperAdmin ? [{ section: 'Plataforma', items: [{ path: '/admin', route: 'admin', label: 'Admin Center', icon: 'admin_panel_settings' }] }] : [])].map(section => (
+          {[...NAV, ...(user?.isSuperAdmin ? [{ section: 'Plataforma', items: [{ path: '/admin', route: 'admin', label: 'Admin Center', icon: 'admin_panel_settings' }] }] : [])].map(section => ({ ...section, items: section.items.filter(i => !i.permission || can(i.permission)) })).filter(section => section.items.length).map(section => (
             <div key={section.section} className="flex flex-col gap-0.5">
               <div className="px-2 py-0.5 font-mono text-[10px] tracking-wider text-text-muted uppercase">{section.section}</div>
               {section.items.map(item => {

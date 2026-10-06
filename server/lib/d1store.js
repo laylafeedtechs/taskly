@@ -42,7 +42,15 @@ export const TABLES = {
   privacyRequests: 'privacy_requests',
   mfaChallenges: 'mfa_challenges',
   emailVerifications: 'email_verifications',
-  oauthStates: 'oauth_states'
+  oauthStates: 'oauth_states',
+  socialAccounts: 'social_accounts',
+  socialCredentials: 'social_credentials',
+  socialMedia: 'social_media',
+  creatives: 'creatives',
+  campaigns: 'campaigns',
+  publications: 'publications',
+  publicationApprovals: 'publication_approvals',
+  publicationAttempts: 'publication_attempts'
 };
 // Non-collection objects stored in app_state.
 const STATE_KEYS = ['meta', 'systemSettings'];
@@ -80,15 +88,29 @@ async function readVersion(D1) {
   return row ? Number(row.value) : 0;
 }
 
+// D1 accepts at most 5 terms in a compound SELECT, so tables are read in
+// groups of 5 per query (~8 queries instead of one per table), which keeps a
+// cold load well under the per-invocation query limit.
+const UNION_TERMS = 5;
+const STATE_TERM = '__state';
+
 async function loadFromD1(D1, version) {
-  const names = Object.keys(TABLES);
-  const results = await D1.batch([
-    ...names.map(c => D1.prepare(`SELECT id, pos, data FROM ${TABLES[c]} ORDER BY pos`)),
-    D1.prepare(`SELECT key, value FROM app_state WHERE key IN (${STATE_KEYS.map(() => '?').join(',')})`).bind(...STATE_KEYS)
-  ]);
-  const rows = {};
-  names.forEach((c, i) => { rows[c] = results[i].results; });
-  const state = Object.fromEntries(results[names.length].results.map(r => [r.key, r.value]));
+  const terms = [
+    ...Object.entries(TABLES).map(([c, t]) => ({ sql: `SELECT '${c}' AS c, id, pos, data FROM ${t}`, params: [] })),
+    { sql: `SELECT '${STATE_TERM}' AS c, key AS id, 0 AS pos, value AS data FROM app_state WHERE key IN (${STATE_KEYS.map(() => '?').join(',')})`, params: STATE_KEYS }
+  ];
+  const statements = [];
+  for (let i = 0; i < terms.length; i += UNION_TERMS) {
+    const group = terms.slice(i, i + UNION_TERMS);
+    statements.push(D1.prepare(`${group.map(g => g.sql).join(' UNION ALL ')} ORDER BY c, pos`).bind(...group.flatMap(g => g.params)));
+  }
+  const results = await D1.batch(statements);
+  const rows = Object.fromEntries(Object.keys(TABLES).map(c => [c, []]));
+  const state = {};
+  for (const r of results.flatMap(x => x.results)) {
+    if (r.c === STATE_TERM) state[r.id] = r.data;
+    else rows[r.c]?.push({ id: r.id, pos: r.pos, data: r.data });
+  }
   return { version, rows, state };
 }
 
@@ -229,6 +251,13 @@ export function d1Middleware(getD1) {
         end(body);
       });
       return res;
+    };
+    // Routes that stream large bodies (videos) persist and release the lock
+    // first, so other requests are not queued behind the transfer.
+    res.locals.commitStore = async () => {
+      if (finishing) return;
+      finishing = true;
+      try { await flushStore(D1, store); } finally { release(); }
     };
     requestStore.run(store, next);
   };

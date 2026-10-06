@@ -10,12 +10,13 @@ const CATEGORIES = [
   { id: 'All', label: 'Todas', icon: 'inbox' },
   { id: 'Mentions', label: 'Menções', icon: 'alternate_email' },
   { id: 'Assignments', label: 'Atribuições', icon: 'assignment_ind' },
+  { id: 'Creatives', label: 'Criativos', icon: 'photo_library' },
   { id: 'Comments', label: 'Comentários', icon: 'chat_bubble' },
   { id: 'Deadlines', label: 'Prazos', icon: 'schedule' },
   { id: 'System', label: 'Sistema', icon: 'settings' }
 ];
 const STATUSES = [{ value: 'active', label: 'Ativas' }, { value: 'unread', label: 'Não lidas' }, { value: 'archived', label: 'Arquivadas' }];
-const EVENT_ICON = { automation: 'bolt', security: 'shield', invitation: 'mail' };
+const EVENT_ICON = { automation: 'bolt', security: 'shield', invitation: 'mail', creatives: 'photo_library' };
 const CATEGORY_ICON = Object.fromEntries(CATEGORIES.map(c => [c.id, c.icon]));
 const PAGE_SIZE = 20;
 
@@ -53,6 +54,7 @@ export function NotificationsView() {
   const openNotification = n => {
     if (n.unread) run(() => api.notifications.markRead(n.id));
     if (n.taskId) openTask(n.taskId);
+    else if (n.link) navigate(n.link);
   };
 
   const removeSelected = async targetIds => {

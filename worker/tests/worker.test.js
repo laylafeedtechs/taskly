@@ -183,3 +183,39 @@ test('non-API paths are served by Static Assets with security headers', async ()
   assert.match(res.headers.get('content-type'), /text\/html/);
   assert.match(res.headers.get('content-security-policy') || '', /script-src 'self'/);
 });
+
+// ---------------------------------------------------------------- Criativos
+
+test('Criativos on D1: campaigns persist across requests and the new tables load', async () => {
+  const ws = (await user.get('/workspaces')).data.workspaces[0];
+  const accounts = await user.get(`/social/workspace/${ws.id}/accounts`);
+  assert.equal(accounts.status, 200);
+  assert.deepEqual(accounts.data.accounts, []);
+  assert.equal(accounts.data.integrations.find(i => i.provider === 'instagram').configured, false, 'no Meta credentials in local dev');
+  const created = await user.post(`/campaigns/workspace/${ws.id}`, { name: 'Campanha no D1', status: 'ACTIVE' });
+  assert.equal(created.status, 201, JSON.stringify(created.data));
+  const list = await client().post('/auth/login', { email, password }).then(() => user.get(`/campaigns/workspace/${ws.id}`));
+  assert.ok(list.data.campaigns.some(c => c.id === created.data.campaign.id));
+  const overview = await user.get(`/publications/workspace/${ws.id}/overview`);
+  assert.equal(overview.status, 200);
+  assert.equal(overview.data.metrics.activeCampaigns, 1);
+});
+
+test('Criativos on D1: connecting without Meta credentials is refused clearly', async () => {
+  const ws = (await user.get('/workspaces')).data.workspaces[0];
+  const r = await user.post(`/social/workspace/${ws.id}/accounts/connect`, { provider: 'instagram' });
+  assert.equal(r.status, 400);
+  assert.equal(r.data.code, 'INTEGRATION_NOT_CONFIGURED');
+  assert.deepEqual(r.data.details.requiredConfig, ['INSTAGRAM_APP_ID', 'INSTAGRAM_APP_SECRET']);
+});
+
+test('Criativos on D1: library uploads answer 503 until R2 is bound; publications need an account', async () => {
+  const ws = (await user.get('/workspaces')).data.workspaces[0];
+  const jpg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 16, 74, 70, 73, 70, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0xff, 0xc0, 0, 17, 8, 5, 70, 4, 56, 3, 1, 34, 0, 2, 17, 1, 3, 17, 1, 0xff, 0xd9]);
+  const res = await fetch(`${API}/creatives/workspace/${ws.id}/upload`, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', 'X-Requested-With': 'taskly', 'X-File-Name': 'arte.jpg', Origin: BASE, Cookie: user.cookie }, body: jpg });
+  assert.equal(res.status, 503);
+  assert.equal((await res.json()).code, 'STORAGE_NOT_CONFIGURED');
+  const pub = await user.post(`/publications/workspace/${ws.id}`, { type: 'POST', title: 'Sem conta' });
+  assert.equal(pub.status, 400);
+  assert.equal((await fetch(`${API}/social/media/forged.token`)).status, 404, 'signed media URLs cannot be forged');
+});

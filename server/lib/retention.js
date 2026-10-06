@@ -16,7 +16,8 @@ export const DEFAULT_RETENTION = {
   auditIpDays: 90,
   closedIncidentsDays: 1825,
   privacyRequestsDays: 1825,
-  backupsKeep: 14
+  backupsKeep: 14,
+  publicationAttemptsDays: 365
 };
 
 export const retentionSettings = () => ({ ...DEFAULT_RETENTION, ...(db.data.systemSettings?.retention || {}) });
@@ -46,6 +47,7 @@ export function runRetention() {
   drop('automationLogs', l => olderThan(l.timestamp, r.automationLogsDays));
   drop('securityIncidents', i => i.status === 'closed' && olderThan(i.updatedAt, r.closedIncidentsDays));
   drop('privacyRequests', p => p.status === 'completed' && olderThan(p.updatedAt, r.privacyRequestsDays));
+  drop('publicationAttempts', a => a.finishedAt && olderThan(a.finishedAt, r.publicationAttemptsDays));
 
   // Trash: items past the period are permanently deleted.
   let purged = 0;

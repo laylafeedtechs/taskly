@@ -63,3 +63,9 @@ export function unseal(value) {
   if (!isSealed(value)) return value;
   return decryptBuffer(Buffer.from(value.slice(PREFIX.length), 'base64')).toString('utf8');
 }
+
+// Purpose-bound subkeys (e.g. signing public media URLs), so the encryption
+// key itself is never used for anything but encryption.
+export function deriveKey(purpose) {
+  return crypto.createHmac('sha256', loadKey()).update(`taskly:${purpose}`).digest();
+}

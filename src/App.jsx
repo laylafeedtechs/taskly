@@ -30,6 +30,7 @@ const TeamView = lazyNamed(() => import('./components/views/TeamView'), 'TeamVie
 const SettingsView = lazyNamed(() => import('./components/views/SettingsView'), 'SettingsView');
 const TrashView = lazyNamed(() => import('./components/views/TrashView'), 'TrashView');
 const AdminCenterView = lazyNamed(() => import('./components/views/AdminCenterView'), 'AdminCenterView');
+const CreativesView = lazyNamed(() => import('./components/creatives/CreativesView'), 'CreativesView');
 const TaskDetailDrawer = lazyNamed(() => import('./components/tasks/TaskDetailDrawer'), 'TaskDetailDrawer');
 const ProjectModal = lazyNamed(() => import('./components/projects/ProjectModal'), 'ProjectModal');
 
@@ -47,7 +48,8 @@ const ROUTES = {
   team: TeamView,
   settings: SettingsView,
   trash: TrashView,
-  admin: AdminCenterView
+  admin: AdminCenterView,
+  creatives: CreativesView
 };
 
 function Splash() {

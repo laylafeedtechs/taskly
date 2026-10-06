@@ -6,7 +6,7 @@ import { PRIORITIES, PRIORITY_LABEL, TASK_TYPES, TYPE_META, formatDate, formatDa
 import { TagPill } from '../common/Badge';
 import { Alert, Btn, Drawer, EmptyState, ErrorState, Field, IconBtn, Input, LoadingState, Menu, Select, Tabs, Textarea } from '../ui';
 import { RecurrenceEditor } from './RecurrenceEditor';
-import { ChecklistSection, DependenciesSection, Section, SubtasksSection } from './TaskDrawerSections';
+import { ChecklistSection, DependenciesSection, PublicationsSection, Section, SubtasksSection } from './TaskDrawerSections';
 import { ActivitySection, AttachmentsSection, CommentsSection } from './TaskDrawerMedia';
 import { useLookups } from './taskUtils';
 
@@ -123,6 +123,7 @@ function TaskDrawerContent({ id, onClose }) {
         <ChecklistSection task={task} canEdit={canEdit} save={save} />
         <SubtasksSection task={task} subtasks={subtasks} />
         <DependenciesSection task={task} fallback={detail.data?.dependencies} canEdit={canEdit} save={save} />
+        <PublicationsSection task={task} />
         <AttachmentsSection task={task} files={files} setFiles={setFiles} loading={detail.loading} error={detail.error} onRetry={detail.reload} />
         <section className="px-5 py-4">
           <Tabs

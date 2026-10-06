@@ -24,6 +24,10 @@ import searchRoutes from './routes/search.js';
 import systemRoutes from './routes/system.js';
 import mfaRoutes from './routes/mfa.js';
 import privacyRoutes from './routes/privacy.js';
+import socialRoutes from './routes/social.js';
+import creativeRoutes from './routes/creatives.js';
+import campaignRoutes from './routes/campaigns.js';
+import publicationRoutes from './routes/publications.js';
 import { authenticate, sessionOnly, csrfGuard, rateLimit, allowedOrigins } from './middleware/auth.js';
 import { startIncidentDetection } from './lib/incidents.js';
 import { log, recordEvent } from './lib/observability.js';
@@ -114,6 +118,10 @@ export function createApp({ beforeApi = [], beforeErrors } = {}) {
   app.use('/api/admin', adminRoutes);
   app.use('/api/search', searchRoutes);
   app.use('/api/system', systemRoutes);
+  app.use('/api/social', socialRoutes);
+  app.use('/api/creatives', creativeRoutes);
+  app.use('/api/campaigns', campaignRoutes);
+  app.use('/api/publications', publicationRoutes);
 
   app.get('/api/health', (req, res) => {
     startedAt ??= Date.now();

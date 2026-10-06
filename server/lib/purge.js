@@ -37,10 +37,18 @@ export function purgeFile(id) {
 // for workspaces the user owns alone).
 export function purgeWorkspace(wsId) {
   db.filter('projects', p => p.workspaceId === wsId).forEach(p => purgeProject(p.id));
+  // Criativos: files, synced previews and avatars; credentials are deleted with the rows.
+  const socialKeys = [
+    ...db.filter('creatives', c => c.workspaceId === wsId).flatMap(c => [c.storageKey, c.thumbKey]),
+    ...db.filter('socialMedia', m => m.workspaceId === wsId).map(m => m.previewKey),
+    ...db.filter('socialAccounts', a => a.workspaceId === wsId).map(a => a.avatarKey)
+  ].filter(Boolean);
   db.transaction(() => {
+    ['socialAccounts', 'socialCredentials', 'socialMedia', 'creatives', 'campaigns', 'publications', 'publicationApprovals', 'publicationAttempts'].forEach(c => db.remove(c, x => x.workspaceId === wsId));
     ['tasks', 'automations', 'automationLogs', 'apiKeys', 'webhooks', 'webhookDeliveries', 'savedReports', 'invitations', 'activity', 'files'].forEach(c => db.remove(c, x => x.workspaceId === wsId));
     db.remove('projectTemplates', t => t.workspaceId === wsId);
     db.remove('notifications', n => n.workspaceId === wsId);
     db.remove('workspaces', w => w.id === wsId);
   });
+  removeStored(socialKeys);
 }

@@ -4,12 +4,13 @@
 
 export const IS_WORKER = typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers';
 
-const state = { env: null, waitUntil: null, detached: null };
+const state = { env: null, waitUntil: null, detached: null, transact: null };
 
-export function configureRuntime({ env, waitUntil, detached }) {
+export function configureRuntime({ env, waitUntil, detached, transact }) {
   state.env = env;
   state.waitUntil = waitUntil;
   state.detached = detached;
+  state.transact = transact;
 }
 
 // Cloudflare bindings (D1, R2…). Null on Node.
@@ -29,4 +30,16 @@ export function background(promise) {
 export function detached(fn) {
   if (IS_WORKER && state.detached) return state.detached(fn);
   return Promise.resolve().then(fn).catch(() => {});
+}
+
+// Persists the request's changes and frees the D1 lock before a long
+// streaming response (no-op on Node, where nothing is held).
+export const commitBeforeStreaming = res => res.locals?.commitStore?.();
+
+// Runs `fn` as one short database transaction outside a request (scheduler,
+// background jobs) and returns its result; errors propagate. Network calls
+// must happen between transactions, never inside `fn`.
+export async function transact(fn) {
+  if (IS_WORKER && state.transact) return state.transact(fn);
+  return fn();
 }

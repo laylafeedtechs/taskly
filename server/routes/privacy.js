@@ -44,6 +44,10 @@ function collectPersonalData(user) {
     tasksCreated: tasks.filter(t => t.createdBy === user.id && !t.deletedAt).map(t => ({ id: t.id, title: t.title, createdAt: t.createdAt })),
     comments: tasks.flatMap(t => (t.comments || []).filter(c => c.userId === user.id).map(c => ({ taskId: t.id, text: c.text, createdAt: c.createdAt }))),
     files: db.filter('files', f => f.uploadedById === user.id && !f.deletedAt).map(f => ({ name: f.name, size: f.size, createdAt: f.createdAt })),
+    creatives: db.filter('creatives', c => c.createdBy === user.id && !c.deletedAt).map(c => ({ name: c.name, kind: c.kind, size: c.size, createdAt: c.createdAt })),
+    publications: db.filter('publications', p => (p.createdBy === user.id || p.responsibleId === user.id) && !p.deletedAt).map(p => ({ title: p.title, type: p.type, status: p.status, caption: p.caption, scheduledAt: p.scheduledAt, publishedAt: p.publishedAt, createdAt: p.createdAt })),
+    publicationApprovals: db.filter('publicationApprovals', a => a.actorId === user.id).map(a => ({ publicationId: a.publicationId, action: a.action, reason: a.reason, at: a.at })),
+    socialAccountsConnected: db.filter('socialAccounts', a => a.connectedBy === user.id).map(a => ({ provider: a.provider, username: a.username, status: a.status, connectedAt: a.connectedAt })),
     activity: db.filter('activity', a => a.actorId === user.id).map(a => ({ type: a.type, message: a.message, taskId: a.taskId, createdAt: a.createdAt })),
     notifications: db.filter('notifications', n => n.userId === user.id).map(n => ({ title: n.title, description: n.description, createdAt: n.createdAt, read: !n.unread })),
     securityLog: db.filter('auditLogs', l => l.actorId === user.id).map(l => ({ action: l.action, result: l.result, ip: l.ip, device: l.device, timestamp: l.timestamp })),
@@ -55,7 +59,7 @@ router.get('/me/summary', (req, res) => {
   const data = collectPersonalData(req.user);
   res.json({
     categories: DATA_CATEGORIES,
-    counts: Object.fromEntries(['memberships', 'sessions', 'tasksAssigned', 'tasksCreated', 'comments', 'files', 'activity', 'notifications', 'securityLog'].map(k => [k, data[k].length]))
+    counts: Object.fromEntries(['memberships', 'sessions', 'tasksAssigned', 'tasksCreated', 'comments', 'files', 'creatives', 'publications', 'activity', 'notifications', 'securityLog'].map(k => [k, data[k].length]))
   });
 });
 
@@ -121,6 +125,17 @@ router.delete('/me/account', rateLimit({ windowMs: 60 * 60 * 1000, max: 5, key: 
     });
     db.get('activity').forEach(a => { if (a.actorId === user.id) Object.assign(a, { actorId: null, actor: label }); });
     db.get('files').forEach(f => { if (f.uploadedById === user.id) Object.assign(f, { uploadedById: null, uploadedBy: label }); });
+    db.get('creatives').forEach(c => { if (c.createdBy === user.id) Object.assign(c, { createdBy: null, createdByName: label }); });
+    db.get('publications').forEach(p => {
+      if (p.createdBy === user.id) p.createdBy = null;
+      if (p.updatedBy === user.id) p.updatedBy = null;
+      if (p.responsibleId === user.id) p.responsibleId = null;
+      if (p.approval?.decidedBy === user.id) Object.assign(p.approval, { decidedBy: null, decidedByName: label });
+      if (p.approval?.requestedBy === user.id) p.approval.requestedBy = null;
+    });
+    db.get('publicationApprovals').forEach(a => { if (a.actorId === user.id) Object.assign(a, { actorId: null, actorName: label }); });
+    db.get('campaigns').forEach(c => { if (c.responsibleId === user.id) c.responsibleId = null; if (c.createdBy === user.id) c.createdBy = null; });
+    db.get('socialAccounts').forEach(a => { if (a.connectedBy === user.id) a.connectedBy = null; });
     db.get('projects').forEach(p => { p.members = (p.members || []).filter(id => id !== user.id); if (p.createdBy === user.id) p.createdBy = null; });
     db.get('apiKeys').forEach(k => { if (k.createdBy === user.id && !k.revokedAt) k.revokedAt = new Date().toISOString(); });
     db.get('privacyRequests').forEach(r => { if (r.userId === user.id) Object.assign(r, { userName: label, userEmail: null }); });

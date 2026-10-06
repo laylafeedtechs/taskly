@@ -4,7 +4,7 @@ import { api } from '../../services/api';
 import { useDebounce } from '../../lib/hooks';
 import { Icon, Kbd, Spinner, Avatar } from '../ui';
 
-const GROUP_LABEL = { actions: 'Ações', tasks: 'Tarefas', projects: 'Projetos', members: 'Membros', workspaces: 'Workspaces', comments: 'Comentários', files: 'Arquivos' };
+const GROUP_LABEL = { actions: 'Ações', tasks: 'Tarefas', projects: 'Projetos', campaigns: 'Campanhas', publications: 'Publicações', creatives: 'Criativos', socialAccounts: 'Contas sociais', members: 'Membros', workspaces: 'Workspaces', comments: 'Comentários', files: 'Arquivos' };
 const normalize = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 export function SearchPalette() {
@@ -53,6 +53,7 @@ export function SearchPalette() {
       { id: 'theme', icon: theme === 'light' ? 'light_mode' : 'dark_mode', label: `Mudar para tema ${theme === 'light' ? 'claro' : 'escuro'}`, run: async () => { close(); try { setUser((await api.auth.updateProfile({ preferences: { ...user.preferences, theme } })).user); } catch (err) { showError(err); } } },
       { id: 'settings', icon: 'settings', label: 'Abrir configurações', hint: 'G S', run: () => go('/settings') },
       { id: 'automations', icon: 'bolt', label: 'Abrir automações', run: () => go('/automations') },
+      can('creatives.view') && { id: 'creatives', icon: 'photo_library', label: 'Abrir Criativos', run: () => go('/creatives') },
       { id: 'team', icon: 'group', label: 'Gerenciar equipe', run: () => go('/team') },
       { id: 'new-ws', icon: 'add_business', label: 'Criar workspace', run: () => { close(); setWorkspaceModal({}); } },
       ...workspaces.filter(w => w.id !== currentWorkspaceId).map(w => ({ id: `ws-${w.id}`, icon: 'swap_horiz', label: `Trocar para workspace: ${w.name}`, run: () => { close(); switchWorkspace(w.id); } })),
@@ -75,6 +76,10 @@ export function SearchPalette() {
     results.workspaces.forEach(w => list.push({ id: `w-${w.id}`, group: 'workspaces', icon: 'business', color: w.color, label: w.name, run: () => { close(); switchWorkspace(w.id); } }));
     results.comments.forEach(c => list.push({ id: `c-${c.id}`, group: 'comments', icon: 'chat_bubble', label: c.text, sub: `${c.userName} em ${c.taskId}`, run: openWs(c.workspaceId, () => openTask(c.taskId)) }));
     results.files.forEach(f => list.push({ id: `f-${f.id}`, group: 'files', icon: 'attach_file', label: f.name, sub: f.formattedSize, run: openWs(f.workspaceId, () => navigate(`/projects/${f.projectId}/files`)) }));
+    (results.campaigns || []).forEach(c => list.push({ id: `cmp-${c.id}`, group: 'campaigns', icon: 'campaign', color: c.color, label: c.name, sub: c.workspaceName, run: openWs(c.workspaceId, () => navigate(c.socialAccountId ? `/creatives/${c.socialAccountId}/campaigns` : '/creatives/campaigns')) }));
+    (results.publications || []).forEach(p => list.push({ id: `pub-${p.id}`, group: 'publications', icon: 'photo_library', label: p.title, sub: `${p.username ? `@${p.username} · ` : ''}${p.status}`, run: openWs(p.workspaceId, () => navigate(`/creatives/${p.socialAccountId}/publications?pub=${encodeURIComponent(p.id)}`)) }));
+    (results.creatives || []).forEach(c => list.push({ id: `crv-${c.id}`, group: 'creatives', icon: c.kind === 'video' ? 'movie' : 'image', label: c.name, sub: 'Biblioteca de criativos', run: openWs(c.workspaceId, () => navigate('/creatives/library')) }));
+    (results.socialAccounts || []).forEach(a => list.push({ id: `sac-${a.id}`, group: 'socialAccounts', icon: 'account_circle', label: `@${a.username}`, sub: a.name, run: openWs(a.workspaceId, () => navigate(`/creatives/${a.id}/feed`)) }));
     return list;
   }, [q, results, actions]); // eslint-disable-line react-hooks/exhaustive-deps
 

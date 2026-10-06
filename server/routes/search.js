@@ -18,7 +18,7 @@ router.get('/workspace/:wsId', authenticate, sessionOnly, workspaceAccess('proje
 function search(req, res, onlyWs) {
   const q = String(req.query.q || '').trim().toLowerCase();
   if (q.length > 100) throw badRequest('Busca muito longa');
-  const empty = { tasks: [], projects: [], members: [], workspaces: [], comments: [], files: [] };
+  const empty = { tasks: [], projects: [], members: [], workspaces: [], comments: [], files: [], campaigns: [], publications: [], creatives: [], socialAccounts: [] };
   if (!q) return res.json(empty);
 
   const workspaces = accessibleWorkspaces(req.user).filter(w => !onlyWs || w.id === onlyWs)
@@ -31,6 +31,9 @@ function search(req, res, onlyWs) {
   const tasks = db.filter('tasks', t => wsIds.has(t.workspaceId) && liveIds.has(t.projectId) && !t.deletedAt);
 
   const memberIds = new Set(workspaces.flatMap(w => w.members.map(m => m.userId)));
+  // Criativos results only for workspaces where the caller may see them.
+  const cWs = new Set(workspaces.filter(w => roleHas(workspaceRole(req.user, w), 'creatives.view')).map(w => w.id));
+  const accountName = Object.fromEntries(db.filter('socialAccounts', a => cWs.has(a.workspaceId)).map(a => [a.id, a.username]));
   res.json({
     tasks: tasks.filter(t => has(t.title) || has(t.id) || (t.tags || []).some(has) || has(t.description))
       .slice(0, 12).map(t => ({ id: t.id, title: t.title, status: t.status, priority: t.priority, projectId: t.projectId, workspaceId: t.workspaceId, workspaceName: wsName[t.workspaceId] })),
@@ -41,7 +44,15 @@ function search(req, res, onlyWs) {
     workspaces: workspaces.filter(w => has(w.name)).slice(0, 5).map(w => ({ id: w.id, name: w.name, color: w.color })),
     comments: tasks.flatMap(t => (t.comments || []).filter(c => has(c.text)).map(c => ({ id: c.id, taskId: t.id, taskTitle: t.title, workspaceId: t.workspaceId, text: c.text.slice(0, 160), userName: c.userName, createdAt: c.createdAt }))).slice(0, 8),
     files: db.filter('files', f => wsIds.has(f.workspaceId) && liveIds.has(f.projectId) && !f.deletedAt && has(f.name)).slice(0, 8)
-      .map(f => ({ id: f.id, name: f.name, projectId: f.projectId, workspaceId: f.workspaceId, formattedSize: f.formattedSize }))
+      .map(f => ({ id: f.id, name: f.name, projectId: f.projectId, workspaceId: f.workspaceId, formattedSize: f.formattedSize })),
+    campaigns: db.filter('campaigns', c => cWs.has(c.workspaceId) && !c.deletedAt && (has(c.name) || has(c.client))).slice(0, 6)
+      .map(c => ({ id: c.id, name: c.name, status: c.status, color: c.color, socialAccountId: c.socialAccountId, workspaceId: c.workspaceId, workspaceName: wsName[c.workspaceId] })),
+    publications: db.filter('publications', p => cWs.has(p.workspaceId) && !p.deletedAt && (has(p.title) || has(p.caption) || (p.hashtags || []).some(has))).slice(0, 8)
+      .map(p => ({ id: p.id, title: p.title, status: p.status, type: p.type, scheduledAt: p.scheduledAt, publishedAt: p.publishedAt, socialAccountId: p.socialAccountId, username: accountName[p.socialAccountId] || null, workspaceId: p.workspaceId })),
+    creatives: db.filter('creatives', c => cWs.has(c.workspaceId) && !c.deletedAt && (has(c.name) || (c.tags || []).some(has))).slice(0, 6)
+      .map(c => ({ id: c.id, name: c.name, kind: c.kind, hasThumb: Boolean(c.thumbKey) || c.kind !== 'video', workspaceId: c.workspaceId })),
+    socialAccounts: db.filter('socialAccounts', a => cWs.has(a.workspaceId) && a.status !== 'DISCONNECTED' && (has(a.username) || has(a.name))).slice(0, 5)
+      .map(a => ({ id: a.id, username: a.username, name: a.name, status: a.status, workspaceId: a.workspaceId }))
   });
 }
 

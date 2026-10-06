@@ -6,8 +6,8 @@ import { badRequest, paginate } from '../lib/http.js';
 const router = express.Router();
 router.use(authenticate, sessionOnly);
 
-const CATEGORIES = ['Mentions', 'Assignments', 'Comments', 'Deadlines', 'System'];
-const EVENTS = ['assignment', 'mention', 'comment', 'deadline', 'automation', 'invitation', 'security'];
+const CATEGORIES = ['Mentions', 'Assignments', 'Comments', 'Deadlines', 'Creatives', 'System'];
+const EVENTS = ['assignment', 'mention', 'comment', 'deadline', 'automation', 'invitation', 'creatives', 'security'];
 
 // Notifications are always scoped to the signed-in user.
 router.get('/', (req, res) => {

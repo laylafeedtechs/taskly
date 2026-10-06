@@ -21,7 +21,16 @@ export const PERMISSIONS = {
   'reports.view': 'Ver relatórios',
   'reports.export': 'Exportar relatórios',
   'trash.purge': 'Excluir permanentemente da lixeira',
-  'billing.manage': 'Gerenciar cobrança'
+  'billing.manage': 'Gerenciar cobrança',
+  'creatives.view': 'Criativos: visualizar',
+  'creatives.create': 'Criativos: criar publicações e enviar criativos',
+  'creatives.edit': 'Criativos: editar publicações e criativos',
+  'creatives.delete': 'Criativos: excluir publicações e criativos',
+  'creatives.approve': 'Criativos: aprovar e rejeitar publicações',
+  'creatives.publish': 'Criativos: agendar e publicar',
+  'creatives.manage_accounts': 'Criativos: conectar e desconectar contas',
+  'creatives.manage_campaigns': 'Criativos: gerenciar campanhas',
+  'creatives.manage_integrations': 'Criativos: configurar integrações e regras'
 };
 
 const ALL = Object.keys(PERMISSIONS);
@@ -29,8 +38,9 @@ const ALL = Object.keys(PERMISSIONS);
 export const ROLE_PERMISSIONS = {
   Owner: ALL,
   Manager: ALL.filter(p => !['workspace.manage', 'billing.manage'].includes(p)),
-  Member: ['project.view', 'project.create', 'project.edit', 'task.create', 'task.edit', 'task.delete', 'task.comment', 'files.upload', 'reports.view', 'reports.export'],
-  Viewer: ['project.view', 'task.comment', 'reports.view']
+  Member: ['project.view', 'project.create', 'project.edit', 'task.create', 'task.edit', 'task.delete', 'task.comment', 'files.upload', 'reports.view', 'reports.export',
+    'creatives.view', 'creatives.create', 'creatives.edit'],
+  Viewer: ['project.view', 'task.comment', 'reports.view', 'creatives.view']
 };
 
 // Which roles a given role may assign to others.

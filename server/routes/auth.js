@@ -43,6 +43,7 @@ export function createUserWithWorkspace({ name, email, passwordHash = null, goog
       events: {
         assignment: { inApp: true, email: true }, mention: { inApp: true, email: true }, comment: { inApp: true, email: false },
         deadline: { inApp: true, email: true }, automation: { inApp: true, email: false }, invitation: { inApp: true, email: true },
+        creatives: { inApp: true, email: false },
         security: { inApp: true, email: true }
       }
     },

@@ -52,6 +52,33 @@ const get = (u, query, opts) => request(u, { query, ...opts });
 const post = (u, body = {}) => request(u, { method: 'POST', body });
 const put = (u, body = {}) => request(u, { method: 'PUT', body });
 const del = (u, body) => request(u, { method: 'DELETE', body });
+const patch = (u, body = {}) => request(u, { method: 'PATCH', body });
+
+// Binary upload (no base64) with progress, used by the creatives library.
+function uploadBinary(endpoint, blob, { headers = {}, onProgress, contentType = 'application/octet-stream' } = {}) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `${API_BASE}${endpoint}`);
+    xhr.withCredentials = true;
+    xhr.setRequestHeader('Content-Type', contentType);
+    xhr.setRequestHeader('X-Requested-With', 'taskly');
+    Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+    if (onProgress) xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
+    xhr.onload = () => {
+      let data = {};
+      try { data = JSON.parse(xhr.responseText || '{}'); } catch { /* non-JSON */ }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(data);
+      else {
+        if (xhr.status === 401) window.dispatchEvent(new CustomEvent('taskly:unauthorized'));
+        reject(new ApiError(xhr.status, data.error || `Erro ${xhr.status}`, data.code, data.details));
+      }
+    };
+    xhr.onerror = () => reject(new ApiError(0, 'Falha de conexão durante o envio.', 'NETWORK'));
+    xhr.send(blob);
+  });
+}
+
+const qs = query => { const p = new URLSearchParams(Object.entries(query || {}).filter(([, v]) => v !== undefined && v !== null && v !== '')); const s = p.toString(); return s ? `?${s}` : ''; };
 
 // Triggers a browser download for an API response (exports, attachments).
 export async function downloadFrom(endpoint, { method = 'GET', body } = {}) {
@@ -258,6 +285,57 @@ export const api = {
     flags: () => get('/system/feature-flags'),
     status: () => get('/system/status'),
     reportError: payload => fetch(`${API_BASE}/system/client-errors`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'taskly' }, body: JSON.stringify(payload), keepalive: true }).catch(() => {})
+  },
+
+  social: {
+    accounts: wsId => get(`/social/workspace/${wsId}/accounts`),
+    connect: (wsId, provider = 'instagram') => post(`/social/workspace/${wsId}/accounts/connect`, { provider }),
+    sync: id => post(`/social/accounts/${id}/sync`),
+    disconnect: id => del(`/social/accounts/${id}`),
+    media: id => get(`/social/accounts/${id}/media`),
+    avatarUrl: id => `${API_BASE}/social/accounts/${id}/avatar`,
+    previewUrl: id => `${API_BASE}/social/media-preview/${id}`
+  },
+
+  creatives: {
+    meta: () => get('/creatives/meta'),
+    settings: wsId => get(`/creatives/workspace/${wsId}/settings`),
+    updateSettings: (wsId, data) => patch(`/creatives/workspace/${wsId}/settings`, data),
+    list: (wsId, query) => get(`/creatives/workspace/${wsId}`, query),
+    get: id => get(`/creatives/${id}`),
+    upload: (wsId, file, { name, query, onProgress } = {}) => uploadBinary(`/creatives/workspace/${wsId}/upload${qs(query)}`, file, { headers: { 'X-File-Name': encodeURIComponent(name || file.name) }, onProgress }),
+    thumbnail: (id, blob) => uploadBinary(`/creatives/${id}/thumbnail`, blob, { contentType: 'image/jpeg' }),
+    update: (id, data) => patch(`/creatives/${id}`, data),
+    duplicate: id => post(`/creatives/${id}/duplicate`),
+    remove: id => del(`/creatives/${id}`),
+    fileUrl: id => `${API_BASE}/creatives/${id}/file`,
+    downloadUrl: id => `${API_BASE}/creatives/${id}/file?download=1`,
+    thumbUrl: id => `${API_BASE}/creatives/${id}/thumb`
+  },
+
+  campaigns: {
+    list: (wsId, query) => get(`/campaigns/workspace/${wsId}`, query),
+    create: (wsId, data) => post(`/campaigns/workspace/${wsId}`, data),
+    update: (id, data) => patch(`/campaigns/${id}`, data),
+    duplicate: (id, data) => post(`/campaigns/${id}/duplicate`, data),
+    remove: id => del(`/campaigns/${id}`)
+  },
+
+  publications: {
+    list: (wsId, query) => get(`/publications/workspace/${wsId}`, query),
+    overview: (wsId, query) => get(`/publications/workspace/${wsId}/overview`, query),
+    feed: (wsId, accountId) => get(`/publications/workspace/${wsId}/feed`, { accountId }),
+    saveFeedOrder: (wsId, accountId, order) => put(`/publications/workspace/${wsId}/feed-order`, { accountId, order }),
+    applyFeedDates: (wsId, accountId, order, confirm = false) => post(`/publications/workspace/${wsId}/feed-apply-dates`, { accountId, order, confirm }),
+    create: (wsId, data) => post(`/publications/workspace/${wsId}`, data),
+    get: id => get(`/publications/${id}`),
+    history: id => get(`/publications/${id}/history`),
+    update: (id, data) => patch(`/publications/${id}`, data),
+    remove: id => del(`/publications/${id}`),
+    duplicate: (id, data) => post(`/publications/${id}/duplicate`, data),
+    action: (id, name, body) => post(`/publications/${id}/${name}`, body),
+    bulk: (wsId, body) => post(`/publications/workspace/${wsId}/bulk`, body),
+    byTask: taskId => get(`/publications/by-task/${encodeURIComponent(taskId)}`)
   },
 
   admin: {

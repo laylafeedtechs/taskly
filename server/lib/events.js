@@ -43,10 +43,11 @@ const CATEGORY_FOR_EVENT = {
   deadline: 'Deadlines',
   automation: 'System',
   invitation: 'System',
+  creatives: 'Creatives',
   security: 'System'
 };
 
-export function notify(userId, { event, title, description, taskId = null, projectId = null, workspaceId = null, actor = null, dedupeKey = null }) {
+export function notify(userId, { event, title, description, taskId = null, projectId = null, workspaceId = null, actor = null, dedupeKey = null, link = null }) {
   const user = db.find('users', u => u.id === userId);
   if (!user || user.status === 'BLOCKED') return null;
   if (actor && actor.id === userId && event !== 'security') return null;
@@ -71,6 +72,8 @@ export function notify(userId, { event, title, description, taskId = null, proje
       taskId,
       projectId,
       workspaceId,
+      // In-app path for notifications that are not about a task (e.g. a publication).
+      link: typeof link === 'string' && link.startsWith('/') ? link : null,
       actorName: actor?.name || null,
       avatar: actor?.avatar || null,
       unread: true,
@@ -86,7 +89,7 @@ export function notify(userId, { event, title, description, taskId = null, proje
       to: user.email,
       subject: `Taskly — ${title}`,
       text: description,
-      actionUrl: taskId ? `${APP_URL()}/?task=${encodeURIComponent(taskId)}` : APP_URL(),
+      actionUrl: taskId ? `${APP_URL()}/?task=${encodeURIComponent(taskId)}` : link ? `${APP_URL()}${link}` : APP_URL(),
       actionLabel: taskId ? 'Abrir tarefa' : 'Abrir Taskly'
     }));
   }
@@ -114,7 +117,26 @@ export const AUTOMATION_TRIGGERS = {
   'task.priority_changed': 'Prioridade alterada para',
   'task.assigned': 'Tarefa atribuída',
   'task.completed': 'Tarefa concluída',
-  'task.commented': 'Comentário adicionado'
+  'task.commented': 'Comentário adicionado',
+  // Criativos
+  'publication.created': 'Criativo/publicação criada',
+  'publication.approved': 'Publicação aprovada',
+  'publication.rejected': 'Publicação rejeitada',
+  'publication.scheduled': 'Publicação agendada',
+  'publication.publishing': 'Publicação sendo enviada',
+  'publication.published': 'Publicação publicada',
+  'publication.failed': 'Publicação falhou'
+};
+export const isPublicationTrigger = type => String(type).startsWith('publication.');
+// Conditions and actions available for publication triggers.
+export const PUBLICATION_FIELDS = ['publicationType', 'socialAccountId', 'campaignId', 'projectId'];
+export const PUBLICATION_ACTIONS = {
+  notify: 'Notificar',
+  create_task: 'Criar tarefa',
+  set_task_status: 'Mover tarefa vinculada para status',
+  add_task_comment: 'Comentar na tarefa vinculada',
+  request_approval: 'Enviar para aprovação',
+  set_campaign_status: 'Alterar status da campanha'
 };
 export const AUTOMATION_FIELDS = ['priority', 'type', 'status', 'tag', 'assigneeId', 'projectId'];
 export const AUTOMATION_OPS = ['eq', 'neq', 'contains'];
@@ -190,13 +212,121 @@ function runAction(action, task, workspace, automation) {
 export function describeAutomation(def) {
   const trig = `${AUTOMATION_TRIGGERS[def.trigger.type] || def.trigger.type}${def.trigger.value ? ` "${def.trigger.value}"` : ''}`;
   const conds = def.conditions.length ? def.conditions.map(c => `${c.field} ${c.op === 'eq' ? '=' : c.op === 'neq' ? '≠' : 'contém'} ${c.value}`).join(' E ') : 'sempre';
-  const acts = def.actions.map(a => `${AUTOMATION_ACTIONS[a.type] || a.type}${a.value ? ` ${a.value}` : a.target ? ` ${a.target}` : ''}`).join(', ');
+  const acts = def.actions.map(a => `${AUTOMATION_ACTIONS[a.type] || PUBLICATION_ACTIONS[a.type] || a.type}${a.value ? ` ${a.value}` : a.target ? ` ${a.target}` : ''}`).join(', ');
   return { trigger: trig, condition: conds, action: acts };
+}
+
+// ------------------------------------------------ publication automations
+
+function publicationConditionMatches(cond, pub) {
+  const actual = cond.field === 'publicationType' ? pub.type : pub[cond.field];
+  if (cond.op === 'contains') return String(actual || '').includes(cond.value);
+  const eq = actual === cond.value;
+  return cond.op === 'neq' ? !eq : eq;
+}
+
+function runPublicationAction(action, pub, workspace, rule, depth) {
+  const target = db.find('publications', p => p.id === pub.id);
+  const linkedTask = target?.taskId ? db.find('tasks', t => t.id === target.taskId && t.workspaceId === workspace.id && !t.deletedAt) : null;
+  const link = `/creatives/${pub.socialAccountId}/publications?pub=${encodeURIComponent(pub.id)}`;
+  switch (action.type) {
+    case 'notify': {
+      const recipients = action.target === 'responsible' ? [pub.responsibleId || pub.createdBy]
+        : action.target === 'creator' ? [pub.createdBy]
+          : action.target === 'project_managers' ? projectManagers(workspace)
+            : [action.target];
+      const valid = recipients.filter(id => id && (workspace.ownerId === id || workspace.members.some(m => m.userId === id)));
+      valid.forEach(uid => notify(uid, { event: 'automation', title: `Automação: ${rule.title}`, description: `Publicação "${pub.title || pub.id}"`, workspaceId: workspace.id, projectId: pub.projectId || null, link }));
+      return `Notificação enviada para ${valid.length} usuário(s)`;
+    }
+    case 'create_task': {
+      const project = target?.projectId && db.find('projects', p => p.id === target.projectId && p.workspaceId === workspace.id && !p.deletedAt);
+      if (!project) throw new Error('A publicação não está vinculada a um projeto');
+      const cols = db.filter('columns', c => c.projectId === project.id).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const status = cols.find(c => c.statusKey === 'To Do')?.statusKey || cols[0]?.statusKey || 'To Do';
+      const now = new Date().toISOString();
+      const task = {
+        id: db.nextTaskId(), title: String(action.value || 'Tarefa da publicação').replace('{titulo}', pub.title || '').slice(0, 200),
+        description: `Criada pela automação "${rule.title}" a partir da publicação "${pub.title || pub.id}".`, status, priority: 'Normal', type: 'Task',
+        tags: ['criativos'], projectId: project.id, workspaceId: workspace.id, assigneeId: pub.responsibleId || null, dueDate: null, startDate: now.slice(0, 10),
+        blockedBy: [], recurrence: null, isRecurring: false, checklist: [], comments: [], milestoneId: null, subtaskOf: null, completedAt: null,
+        createdBy: null, createdAt: now, updatedAt: now, archivedAt: null, deletedAt: null
+      };
+      db.insert('tasks', task);
+      if (target && !target.taskId) target.taskId = task.id;
+      emit({ type: 'task.created', workspaceId: workspace.id, task }, depth + 1);
+      return `Tarefa ${task.id} criada`;
+    }
+    case 'set_task_status': {
+      if (!linkedTask) throw new Error('Nenhuma tarefa vinculada à publicação');
+      if (!db.filter('columns', c => c.projectId === linkedTask.projectId).some(c => c.statusKey === action.value)) throw new Error(`Status "${action.value}" não existe no projeto`);
+      if (linkedTask.status !== action.value) {
+        linkedTask.status = action.value;
+        linkedTask.updatedAt = new Date().toISOString();
+        if (action.value === 'Done') linkedTask.completedAt = linkedTask.updatedAt;
+        emit({ type: 'task.status_changed', workspaceId: workspace.id, task: linkedTask }, depth + 1);
+      }
+      return `Tarefa ${linkedTask.id} movida para ${action.value}`;
+    }
+    case 'add_task_comment': {
+      if (!linkedTask) throw new Error('Nenhuma tarefa vinculada à publicação');
+      linkedTask.comments = linkedTask.comments || [];
+      linkedTask.comments.push({ id: newId('cmt'), userId: null, userName: `Automação: ${rule.title}`, userAvatar: null, text: String(action.value).slice(0, 2000), createdAt: new Date().toISOString() });
+      return `Comentário adicionado em ${linkedTask.id}`;
+    }
+    case 'request_approval': {
+      if (!target || target.status !== 'DRAFT') return 'Ignorado: a publicação não está em rascunho';
+      target.status = 'PENDING_APPROVAL';
+      target.approval = { state: 'PENDING', requestedBy: null, requestedAt: new Date().toISOString(), byAutomation: rule.id };
+      db.insert('publicationApprovals', { id: newId('pap'), publicationId: target.id, workspaceId: workspace.id, action: 'REQUESTED', actorId: null, actorName: `Automação: ${rule.title}`, reason: null, at: new Date().toISOString() });
+      return 'Publicação enviada para aprovação';
+    }
+    case 'set_campaign_status': {
+      const campaign = target?.campaignId && db.find('campaigns', c => c.id === target.campaignId && c.workspaceId === workspace.id && !c.deletedAt);
+      if (!campaign) throw new Error('A publicação não está vinculada a uma campanha');
+      campaign.status = action.value;
+      campaign.updatedAt = new Date().toISOString();
+      return `Campanha "${campaign.name}" marcada como ${action.value}`;
+    }
+    default:
+      throw new Error(`Ação desconhecida: ${action.type}`);
+  }
+}
+
+// Publication rules only run on the first level of an event chain: their
+// actions may emit task events (depth + 1) but never publication events, so
+// rules cannot trigger each other in a loop.
+function runPublicationAutomations(event, depth) {
+  if (depth > 0) return;
+  const workspace = db.find('workspaces', w => w.id === event.workspaceId);
+  if (!workspace) return;
+  const pub = event.publication;
+  const rules = db.filter('automations', a => a.workspaceId === event.workspaceId && a.enabled && a.definition?.trigger?.type === event.type && (!a.projectId || a.projectId === pub.projectId));
+  rules.forEach(rule => {
+    const def = rule.definition;
+    if (def.trigger.value && def.trigger.value !== pub.type) return;
+    if (!def.conditions.every(c => publicationConditionMatches(c, pub))) return;
+    const desc = describeAutomation(def);
+    const log = { id: newId('autlog'), workspaceId: workspace.id, automationId: rule.id, automationTitle: rule.title, taskId: pub.taskId || null, publicationId: pub.id, trigger: desc.trigger, condition: desc.condition, action: desc.action, timestamp: new Date().toISOString() };
+    const results = [];
+    try {
+      def.actions.forEach(a => results.push(runPublicationAction(a, pub, workspace, rule, depth)));
+      Object.assign(log, { status: 'SUCCESS', result: results.join('; '), error: null });
+    } catch (err) {
+      Object.assign(log, { status: 'FAILURE', result: results.join('; ') || null, error: err.message });
+      recordEvent('automation.failed', `Automação "${rule.title}" falhou`, { automationId: rule.id, error: err.message }, 'warn');
+    }
+    rule.executionsCount = (rule.executionsCount || 0) + 1;
+    rule.lastTriggeredAt = log.timestamp;
+    db.get('automationLogs').unshift(log);
+    db.save();
+  });
 }
 
 // Automation actions may change the task, which would emit new events.
 // Depth is capped to prevent infinite loops between rules.
 function runAutomations(event, depth) {
+  if (event.publication) return runPublicationAutomations(event, depth);
   if (depth > 2 || !event.task) return;
   const workspace = db.find('workspaces', w => w.id === event.workspaceId);
   if (!workspace) return;
@@ -442,7 +572,7 @@ export function emit(event, depth = 0) {
   } catch (err) {
     recordEvent('automation.engine_error', 'Erro no motor de automações', { error: err.message }, 'error');
   }
-  if (depth === 0) {
+  if (depth === 0 && !event.publication) {
     const webhookEvent = {
       'task.status_changed': event.task?.status === 'Done' ? 'task.completed' : 'task.updated',
       'task.priority_changed': 'task.updated',

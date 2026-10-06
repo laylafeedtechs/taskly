@@ -230,11 +230,16 @@ test('dependencies block completion unless overridden', async () => {
 });
 
 test('completing a recurring task creates the next occurrence', async () => {
-  const t = await lucas.post('/tasks/workspace/ws-1', { title: 'Reunião semanal', projectId: 'proj-1', dueDate: '2026-10-05', recurrence: { interval: 'weekly', weekdays: [1], time: '09:00' } });
-  assert.equal(t.status, 201);
+  // Next Monday (the test must not depend on today's date).
+  const monday = new Date();
+  monday.setUTCDate(monday.getUTCDate() + (((8 - monday.getUTCDay()) % 7) || 7));
+  const iso = d => d.toISOString().slice(0, 10);
+  const following = new Date(monday.getTime() + 7 * 86400000);
+  const t = await lucas.post('/tasks/workspace/ws-1', { title: 'Reunião semanal', projectId: 'proj-1', dueDate: iso(monday), recurrence: { interval: 'weekly', weekdays: [1], time: '09:00' } });
+  assert.equal(t.status, 201, JSON.stringify(t.data));
   const done = await lucas.put(`/tasks/${t.data.task.id}`, { status: 'Done' });
   assert.equal(done.status, 200);
-  assert.equal(done.data.spawnedTask.dueDate, '2026-10-12');
+  assert.equal(done.data.spawnedTask.dueDate, iso(following));
   assert.equal(done.data.spawnedTask.status, 'To Do');
 });
 

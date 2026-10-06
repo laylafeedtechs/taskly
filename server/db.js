@@ -658,7 +658,7 @@ const defaultData = {
   ]
 };
 
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4; // v4: Criativos (social accounts, library, campaigns, publications)
 const DEMO_PASSWORD = 'taskly123';
 const DEFAULT_COLUMNS = [
   { name: 'Backlog', statusKey: 'Backlog', color: '#666666', wipLimit: null },
@@ -694,7 +694,9 @@ function migrate(data) {
     'users', 'workspaces', 'projects', 'columns', 'tasks', 'milestones', 'projectTemplates',
     'automations', 'automationLogs', 'notifications', 'auditLogs', 'apiKeys', 'webhooks',
     'webhookDeliveries', 'featureFlags', 'savedReports', 'files', 'invitations', 'sessions',
-    'passwordResets', 'activity', 'systemEvents', 'securityIncidents', 'privacyRequests', 'mfaChallenges', 'emailVerifications'
+    'passwordResets', 'activity', 'systemEvents', 'securityIncidents', 'privacyRequests', 'mfaChallenges', 'emailVerifications',
+    'oauthStates', 'socialAccounts', 'socialCredentials', 'socialMedia', 'creatives', 'campaigns', 'publications',
+    'publicationApprovals', 'publicationAttempts'
   ];
   collections.forEach(c => { if (!Array.isArray(data[c])) data[c] = []; });
   data.meta = data.meta || {};

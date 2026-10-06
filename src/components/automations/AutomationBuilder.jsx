@@ -4,12 +4,18 @@ import { api } from '../../services/api';
 import { PRIORITIES, PRIORITY_LABEL, STATUS_LABEL, TASK_TYPES, TYPE_META } from '../../lib/format';
 import { Alert, Btn, Field, Icon, IconBtn, Input, Modal, Select, Textarea, Toggle } from '../ui';
 import { errorText } from '../settings/common';
+import { useAsync } from '../../lib/hooks';
 
-export const FIELD_LABEL = { priority: 'Prioridade', type: 'Tipo', status: 'Status', tag: 'Tag', assigneeId: 'Responsável', projectId: 'Projeto' };
+export const FIELD_LABEL = { priority: 'Prioridade', type: 'Tipo', status: 'Status', tag: 'Tag', assigneeId: 'Responsável', projectId: 'Projeto', publicationType: 'Formato', socialAccountId: 'Conta do Instagram', campaignId: 'Campanha' };
 export const OP_LABEL = { eq: 'é igual a', neq: 'é diferente de', contains: 'contém' };
-const FIELD_KIND = { priority: 'priority', type: 'type', status: 'status', tag: 'text', assigneeId: 'member', projectId: 'project' };
+const FIELD_KIND = { priority: 'priority', type: 'type', status: 'status', tag: 'text', assigneeId: 'member', projectId: 'project', publicationType: 'pubType', socialAccountId: 'account', campaignId: 'campaign' };
 const TRIGGER_KIND = { 'task.status_changed': 'status', 'task.priority_changed': 'priority', 'task.assigned': 'member' };
 const ACTION_KIND = { set_priority: 'priority', set_status: 'status', add_tag: 'text', assign: 'member', notify: 'target' };
+// Publication (Criativos) triggers have their own conditions and actions.
+const isPublication = type => String(type).startsWith('publication.');
+const PUB_ACTION_KIND = { notify: 'pubTarget', create_task: 'taskTitle', set_task_status: 'status', add_task_comment: 'longText', request_approval: null, set_campaign_status: 'campaignStatus' };
+const CAMPAIGN_STATUS_LABEL = { PLANNING: 'Planejamento', ACTIVE: 'Em andamento', FINISHED: 'Finalizada' };
+const defaultsFor = type => (isPublication(type) ? { conditions: [], actions: [{ type: 'notify', target: 'responsible' }] } : { conditions: [], actions: [{ type: 'notify', target: 'assignee' }] });
 
 const EMPTY = { title: '', description: '', projectId: '', enabled: true, trigger: { type: 'task.created', value: '' }, conditions: [], actions: [{ type: 'notify', target: 'assignee' }] };
 
@@ -25,16 +31,24 @@ function fromAutomation(a) {
 }
 
 // Context-appropriate value picker for triggers, conditions and actions.
-function ValueInput({ kind, value, onChange, label, statusOptions, optional = false }) {
+function ValueInput({ kind, value, onChange, label, statusOptions, optional = false, extra = {} }) {
   const { members, projects } = useApp();
+  if (!kind) return <span className="text-[12px] text-text-muted">Sem parâmetros</span>;
   if (kind === 'text') return <Input value={value} onChange={e => onChange(e.target.value)} placeholder="ex.: cliente" aria-label={label} maxLength={60} />;
+  if (kind === 'taskTitle') return <Input value={value} onChange={e => onChange(e.target.value)} placeholder="ex.: Acompanhar publicação: {titulo}" aria-label={label} maxLength={200} />;
+  if (kind === 'longText') return <Input value={value} onChange={e => onChange(e.target.value)} placeholder="Texto do comentário" aria-label={label} maxLength={2000} />;
   const options = {
     priority: PRIORITIES.map(p => [p, PRIORITY_LABEL[p]]),
     type: TASK_TYPES.map(t => [t, TYPE_META[t].label]),
     status: statusOptions,
     member: members.map(m => [m.id, m.name]),
     project: projects.map(p => [p.id, p.name]),
-    target: [['assignee', 'Responsável pela tarefa'], ['project_managers', 'Gestores do workspace'], ...members.map(m => [m.id, m.name])]
+    target: [['assignee', 'Responsável pela tarefa'], ['project_managers', 'Gestores do workspace'], ...members.map(m => [m.id, m.name])],
+    pubTarget: [['responsible', 'Responsável pela publicação'], ['creator', 'Quem criou a publicação'], ['project_managers', 'Gestores do workspace'], ...members.map(m => [m.id, m.name])],
+    pubType: Object.entries(extra.publicationTypes || {}),
+    account: (extra.accounts || []).map(a => [a.id, `@${a.username}`]),
+    campaign: (extra.campaigns || []).map(c => [c.id, c.name]),
+    campaignStatus: (extra.campaignStatuses || []).map(st => [st, CAMPAIGN_STATUS_LABEL[st] || st])
   }[kind] || [];
   return (
     <Select value={value} onChange={e => onChange(e.target.value)} aria-label={label}>
@@ -73,6 +87,13 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
   }, [form.projectId, columnsByProject]);
 
   const set = patch => setForm(f => ({ ...f, ...patch }));
+  const pub = isPublication(form.trigger.type);
+  // Accounts and campaigns are only needed for publication rules.
+  const pubData = useAsync(() => (open && pub ? Promise.all([api.social.accounts(currentWorkspaceId), api.campaigns.list(currentWorkspaceId)]) : Promise.resolve(null)), [open, pub, currentWorkspaceId]);
+  const extra = { publicationTypes: meta.publicationTypes, campaignStatuses: meta.campaignStatuses, accounts: pubData.data?.[0]?.accounts || [], campaigns: pubData.data?.[1]?.campaigns || [] };
+  const fields = pub ? meta.publicationFields || [] : meta.fields;
+  const actionsMeta = pub ? meta.publicationActions || {} : meta.actions;
+  const actionKind = type => (pub ? PUB_ACTION_KIND[type] : ACTION_KIND[type]);
   const setList = (key, idx, patch) => setForm(f => ({ ...f, [key]: f[key].map((x, i) => (i === idx ? { ...x, ...patch } : x)) }));
   const removeFrom = (key, idx) => setForm(f => ({ ...f, [key]: f[key].filter((_, i) => i !== idx) }));
 
@@ -87,7 +108,7 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
       definition: {
         trigger: { type: form.trigger.type, value: form.trigger.value || null },
         conditions: form.conditions,
-        actions: form.actions.map(a => (a.type === 'notify' ? { type: 'notify', target: a.target } : { type: a.type, value: a.value }))
+        actions: form.actions.map(a => (a.type === 'notify' ? { type: 'notify', target: a.target } : a.type === 'request_approval' ? { type: a.type } : { type: a.type, value: a.value }))
       }
     };
     try {
@@ -102,7 +123,7 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
     }
   };
 
-  const triggerKind = TRIGGER_KIND[form.trigger.type];
+  const triggerKind = pub ? 'pubType' : TRIGGER_KIND[form.trigger.type];
 
   return (
     <Modal open={open} onClose={onClose} size="lg" title={automation ? 'Editar automação' : 'Nova automação'} description="Quando algo acontecer (WHEN), se as condições forem atendidas (IF), execute as ações (THEN)."
@@ -133,10 +154,11 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
         <div>
           <Block step="WHEN" title="Quando" subtitle="o gatilho" tone="text-blue-400 bg-blue-500/10 border-blue-500/25">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <Select value={form.trigger.type} onChange={e => set({ trigger: { type: e.target.value, value: '' } })} aria-label="Gatilho">
-                {Object.entries(meta.triggers).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              <Select value={form.trigger.type} onChange={e => { const type = e.target.value; set({ trigger: { type, value: '' }, ...(isPublication(type) !== pub ? defaultsFor(type) : {}) }); }} aria-label="Gatilho">
+                <optgroup label="Tarefas">{Object.entries(meta.triggers).filter(([k]) => !isPublication(k)).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</optgroup>
+                <optgroup label="Criativos">{Object.entries(meta.triggers).filter(([k]) => isPublication(k)).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</optgroup>
               </Select>
-              {triggerKind && <ValueInput kind={triggerKind} optional value={form.trigger.value} onChange={value => set({ trigger: { ...form.trigger, value } })} label="Valor do gatilho" statusOptions={statusOptions} />}
+              {triggerKind && <ValueInput kind={triggerKind} optional value={form.trigger.value} onChange={value => set({ trigger: { ...form.trigger, value } })} label="Valor do gatilho" statusOptions={statusOptions} extra={extra} />}
             </div>
           </Block>
           <Connector />
@@ -146,17 +168,17 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
               {form.conditions.map((c, i) => (
                 <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_1.3fr_auto] gap-2 items-center pb-2 sm:pb-0 border-b border-border-subtle sm:border-0">
                   <Select value={c.field} onChange={e => setList('conditions', i, { field: e.target.value, value: '' })} aria-label={`Campo da condição ${i + 1}`}>
-                    {meta.fields.map(f => <option key={f} value={f}>{FIELD_LABEL[f] || f}</option>)}
+                    {fields.map(f => <option key={f} value={f}>{FIELD_LABEL[f] || f}</option>)}
                   </Select>
                   <Select value={c.op} onChange={e => setList('conditions', i, { op: e.target.value })} aria-label={`Operador da condição ${i + 1}`}>
                     {meta.ops.map(o => <option key={o} value={o}>{OP_LABEL[o] || o}</option>)}
                   </Select>
-                  <ValueInput kind={FIELD_KIND[c.field]} value={c.value} onChange={value => setList('conditions', i, { value })} label={`Valor da condição ${i + 1}`} statusOptions={statusOptions} />
+                  <ValueInput kind={FIELD_KIND[c.field]} value={c.value} onChange={value => setList('conditions', i, { value })} label={`Valor da condição ${i + 1}`} statusOptions={statusOptions} extra={extra} />
                   <IconBtn icon="delete" label={`Remover condição ${i + 1}`} onClick={() => removeFrom('conditions', i)} />
                 </div>
               ))}
               {form.conditions.length < 10 && (
-                <div><Btn size="xs" variant="ghost" icon="add" onClick={() => set({ conditions: [...form.conditions, { field: 'priority', op: 'eq', value: '' }] })}>Adicionar condição</Btn></div>
+                <div><Btn size="xs" variant="ghost" icon="add" onClick={() => set({ conditions: [...form.conditions, { field: fields[0], op: 'eq', value: '' }] })}>Adicionar condição</Btn></div>
               )}
             </div>
           </Block>
@@ -164,11 +186,11 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
           <Block step="THEN" title="Então" subtitle="execute as ações em ordem" tone="text-emerald-400 bg-emerald-500/10 border-emerald-500/25">
             <div className="flex flex-col gap-2">
               {form.actions.map((a, i) => {
-                const kind = ACTION_KIND[a.type];
+                const kind = actionKind(a.type);
                 return (
                   <div key={i} className="grid grid-cols-1 sm:grid-cols-[1fr_1.4fr_auto] gap-2 items-center pb-2 sm:pb-0 border-b border-border-subtle sm:border-0">
-                    <Select value={a.type} onChange={e => setList('actions', i, e.target.value === 'notify' ? { type: 'notify', target: 'assignee', value: undefined } : { type: e.target.value, value: '', target: undefined })} aria-label={`Ação ${i + 1}`}>
-                      {Object.entries(meta.actions).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+                    <Select value={a.type} onChange={e => setList('actions', i, e.target.value === 'notify' ? { type: 'notify', target: pub ? 'responsible' : 'assignee', value: undefined } : { type: e.target.value, value: '', target: undefined })} aria-label={`Ação ${i + 1}`}>
+                      {Object.entries(actionsMeta).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
                     </Select>
                     <ValueInput
                       kind={kind}
@@ -176,13 +198,14 @@ export function AutomationBuilder({ open, automation, meta, onClose, onSaved }) 
                       onChange={v => setList('actions', i, kind === 'target' ? { target: v } : { value: v })}
                       label={`Valor da ação ${i + 1}`}
                       statusOptions={statusOptions}
+                      extra={extra}
                     />
                     <IconBtn icon="delete" label={`Remover ação ${i + 1}`} onClick={() => removeFrom('actions', i)} disabled={form.actions.length === 1} className="disabled:opacity-40" />
                   </div>
                 );
               })}
               {form.actions.length < 10 && (
-                <div><Btn size="xs" variant="ghost" icon="add" onClick={() => set({ actions: [...form.actions, { type: 'add_tag', value: '' }] })}>Adicionar ação</Btn></div>
+                <div><Btn size="xs" variant="ghost" icon="add" onClick={() => set({ actions: [...form.actions, pub ? { type: 'create_task', value: '' } : { type: 'add_tag', value: '' }] })}>Adicionar ação</Btn></div>
               )}
             </div>
           </Block>

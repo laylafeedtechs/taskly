@@ -4,6 +4,8 @@ import { pluralize } from '../../lib/format';
 import { StatusBadge } from '../common/Badge';
 import { Avatar, Btn, Checkbox, Icon, IconBtn, Input, ProgressBar, SearchInput } from '../ui';
 import { useLookups } from './taskUtils';
+import { api } from '../../services/api';
+import { useAsync } from '../../lib/hooks';
 
 export function Section({ title, icon, count, action, children }) {
   return (
@@ -229,6 +231,39 @@ export function DependenciesSection({ task, fallback, canEdit, save }) {
         </ul>
       ) : <p className="text-[12px] text-text-muted">Esta tarefa não bloqueia outras.</p>}
       {blocks.length > 0 && <p className="mt-2 text-[11px] text-text-muted">{pluralize(blocks.length, 'tarefa depende', 'tarefas dependem')} da conclusão desta.</p>}
+    </Section>
+  );
+}
+
+// ------------------------------------------------- linked publications
+
+const PUB_STATUS = { DRAFT: 'Rascunho', PENDING_APPROVAL: 'Em aprovação', APPROVED: 'Aprovado', SCHEDULED: 'Agendado', PUBLISHING: 'Publicando', PUBLISHED: 'Publicado', FAILED: 'Erro', CANCELLED: 'Cancelado' };
+
+// Criativos ↔ Tarefas: publications linked to this task (Task → Creative → Publication).
+export function PublicationsSection({ task }) {
+  const { can, navigate } = useApp();
+  const allowed = can('creatives.view');
+  const { data } = useAsync(() => (allowed ? api.publications.byTask(task.id) : Promise.resolve({ publications: [] })), [task.id, allowed, task.updatedAt]);
+  const pubs = data?.publications || [];
+  if (!allowed || !pubs.length) return null;
+  return (
+    <Section title="Publicações" icon="photo_library" count={pubs.length}>
+      <ul className="flex flex-col gap-1.5">
+        {pubs.map(p => (
+          <li key={p.id}>
+            <button type="button" onClick={() => navigate(`/creatives/${p.socialAccountId}/publications?pub=${encodeURIComponent(p.id)}`)} className="w-full flex items-center gap-2.5 p-2 rounded-lg border border-border hover:bg-surface-hover text-left">
+              <span className="w-8 h-10 rounded overflow-hidden bg-surface-elevated flex-shrink-0">
+                {p.media?.[0]?.creative?.available ? <img src={api.creatives.thumbUrl(p.media[0].creative.id)} alt="" loading="lazy" className="w-full h-full object-cover" /> : <Icon name="image" size={16} className="m-auto mt-3 text-text-muted" />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12px] text-text-primary truncate">{p.title}</span>
+                <span className="block text-[11px] text-text-muted">{PUB_STATUS[p.status] || p.status}{p.scheduledAt ? ` · ${new Date(p.publishedAt || p.scheduledAt).toLocaleString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+              </span>
+              <Icon name="chevron_right" size={16} className="text-text-muted" />
+            </button>
+          </li>
+        ))}
+      </ul>
     </Section>
   );
 }

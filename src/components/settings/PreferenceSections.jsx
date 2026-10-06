@@ -86,6 +86,7 @@ const EVENT_META = {
   deadline: { label: 'Prazos', description: 'Tarefas vencendo ou atrasadas' },
   automation: { label: 'Automações', description: 'Avisos enviados por regras de automação' },
   invitation: { label: 'Convites', description: 'Convites para workspaces' },
+  creatives: { label: 'Criativos', description: 'Aprovações, agendamentos, publicações e contas do Instagram' },
   security: { label: 'Segurança', description: 'Senha, e-mail, papéis e acessos' }
 };
 

@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { Readable } from 'stream';
 import { DATA_DIR } from '../db.js';
 import { badRequest, HttpError } from './http.js';
 import { IS_WORKER, bindings, background } from './runtime.js';
@@ -103,6 +104,70 @@ export function deleteStored(key) {
   }
   const full = path.join(UPLOAD_DIR, key);
   if (fs.existsSync(full)) fs.unlinkSync(full);
+}
+
+// Whether uploads can be stored in this environment (R2 bound, or Node disk).
+export const storageAvailable = () => !IS_WORKER || Boolean(bindings()?.FILES);
+
+// Single "bytes=a-b" / "bytes=a-" range, as browsers send for media seeking.
+function parseRange(header, size) {
+  const m = /^bytes=(\d+)-(\d*)$/.exec(String(header || ''));
+  if (!m) return null;
+  const start = Number(m[1]);
+  const end = m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+  return start <= end && start < size ? { start, end } : 'invalid';
+}
+
+/**
+ * Streams a stored object to the response (no full buffering, so large videos
+ * do not exhaust Worker memory), honouring HTTP Range requests.
+ * Returns false when the object does not exist.
+ */
+export async function streamStored(req, res, key, { contentType, disposition = 'inline', fileName = 'arquivo', cache = 'private, max-age=300' } = {}) {
+  if (!validKey(key)) return false;
+  let size;
+  let open;
+  if (IS_WORKER) {
+    const head = await bucket().head(key);
+    if (!head) return false;
+    size = head.size;
+    open = async range => {
+      const obj = await bucket().get(key, range ? { range: { offset: range.start, length: range.end - range.start + 1 } } : undefined);
+      return obj?.body ? Readable.fromWeb(obj.body) : null;
+    };
+  } else {
+    const full = path.join(UPLOAD_DIR, key);
+    if (!fs.existsSync(full)) return false;
+    size = fs.statSync(full).size;
+    open = async range => fs.createReadStream(full, range ? { start: range.start, end: range.end } : undefined);
+  }
+  const range = req.headers.range ? parseRange(req.headers.range, size) : null;
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self' data:; media-src 'self'; sandbox");
+  res.setHeader('Content-Disposition', `${disposition}; filename*=UTF-8''${encodeURIComponent(fileName)}`);
+  res.setHeader('Cache-Control', cache);
+  res.setHeader('Accept-Ranges', 'bytes');
+  if (range === 'invalid') {
+    res.setHeader('Content-Range', `bytes */${size}`);
+    res.status(416).end();
+    return true;
+  }
+  if (range) {
+    res.status(206);
+    res.setHeader('Content-Range', `bytes ${range.start}-${range.end}/${size}`);
+    res.setHeader('Content-Length', String(range.end - range.start + 1));
+  } else {
+    res.setHeader('Content-Length', String(size));
+  }
+  const stream = await open(range);
+  if (!stream) return false;
+  await new Promise((resolve, reject) => {
+    stream.on('error', reject);
+    res.on('close', resolve);
+    stream.pipe(res);
+  });
+  return true;
 }
 
 export function formatSize(bytes) {

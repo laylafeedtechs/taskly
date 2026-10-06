@@ -8,7 +8,7 @@ O Taskly roda em produção como **um único Worker**:
 | API `/api/*` | O mesmo app Express de `server/app.js`, dentro do Worker via `httpServerHandler` (`cloudflare:node`) |
 | Banco | Cloudflare D1 (`DB`) |
 | Arquivos enviados e avatares | Cloudflare R2 (`FILES`, opcional) |
-| Tarefas periódicas | Cron Trigger (`0 * * * *`) |
+| Tarefas periódicas | Cron Trigger (`* * * * *`): agendador de publicações a cada minuto; manutenção na hora cheia |
 | E-mail | API HTTP do Resend (`RESEND_API_KEY`) |
 
 O servidor Node (`npm start`) continua funcionando para desenvolvimento e auto-hospedagem: as rotas, a autenticação, o MFA, o CSRF e o rate limiting são o **mesmo código** nos dois ambientes.
@@ -65,13 +65,23 @@ Cada coleção do antigo `taskly_db.json` virou uma tabela `(id TEXT PRIMARY KEY
 | mfaChallenges | mfa_challenges |
 | emailVerifications | email_verifications |
 | oauthStates | oauth_states |
+| socialAccounts | social_accounts |
+| socialCredentials | social_credentials |
+| socialMedia | social_media |
+| creatives | creatives |
+| campaigns | campaigns |
+| publications | publications |
+| publicationApprovals | publication_approvals |
+| publicationAttempts | publication_attempts |
+
+Criativos (Instagram): veja [criativos.md](criativos.md).
 
 Índices (`migrations/0002_indexes.sql`) cobrem os campos de busca e de relacionamento. Os índices **únicos** garantem no próprio banco que não haja e-mail duplicado, conta Google duplicada, token de sessão duplicado, hash de API key duplicado, token de convite duplicado nem chave de feature flag duplicada.
 
 ### Ciclo de uma requisição (`server/lib/d1store.js`)
 
 1. A requisição entra na fila do isolate, para que requisições simultâneas no mesmo isolate não leiam o mesmo snapshot.
-2. O store lê `version` (1 query). Se for a mesma do cache do isolate, os dados vêm da memória; se não, vêm do D1 em um `batch()` (28 queries).
+2. O store lê `version` (1 query). Se for a mesma do cache do isolate, os dados vêm da memória; se não, vêm do D1 em um `batch()` de cerca de 8 queries (tabelas agrupadas de 5 em 5, o máximo de termos de `UNION` aceito pelo D1).
 3. A rota roda normalmente, com uma cópia privada dos dados (AsyncLocalStorage).
 4. Antes de liberar a resposta, só as linhas inseridas, alteradas ou removidas são gravadas em **um `batch()`**, que o D1 executa como transação. A primeira instrução é uma trava de versão: se outro isolate gravou nesse meio-tempo, a transação inteira é desfeita e a API responde **409 `DB_CONFLICT`**.
 5. O frontend (`src/services/api.js`) repete automaticamente, até 3 vezes, as requisições que receberam `DB_CONFLICT`. Isso é seguro porque a tentativa anterior não gravou nada.
@@ -84,6 +94,7 @@ Uma resposta 2xx significa, portanto, que os dados **já estão gravados**. Se a
 |---|---|
 | `migrations/0001_initial.sql` | `app_state` e as 27 tabelas |
 | `migrations/0002_indexes.sql` | índices de busca, relacionamento e unicidade |
+| `migrations/0003_creatives.sql` | Criativos: contas sociais, credenciais, biblioteca, campanhas, publicações, aprovações e tentativas |
 
 ```bash
 npm run d1:migrate:local    # banco do wrangler dev
@@ -172,6 +183,7 @@ O comando usa o mesmo código do app: encerra as sessões da pessoa, registra a 
 | `TASKLY_ENCRYPTION_KEY` | **segredo** (obrigatório) | `wrangler secret put` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | **segredo** (opcional) | `wrangler secret put` |
 | `RESEND_API_KEY` | **segredo** (opcional) | `wrangler secret put` |
+| `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` | **segredo** (Criativos) | `wrangler secret put` |
 
 Para desenvolvimento local, os segredos ficam em `.dev.vars`, que está no `.gitignore`.
 
