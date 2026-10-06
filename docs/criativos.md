@@ -253,3 +253,41 @@ Membros podem excluir os próprios rascunhos e criativos que não estejam em uso
 - **Localização.** O ID da localização é o ID numérico de uma página do Facebook. Não há busca de locais pela API do Instagram Login.
 - **Arrastar e soltar.** Usa HTML5 nativo, que não funciona no toque. No celular, as datas são alteradas pelo editor.
 - **Métricas.** Só os números devolvidos pela API (seguidores, total de posts). Nenhuma métrica é estimada.
+
+## Production readiness
+
+Go-live realizado em 06/10/2026. Commit `c015c81`, versão do Worker `226a9b7f`, migration `0003_creatives.sql` aplicada no D1 `taskly` (`6e305d31-b5ec-41f3-af6a-afe9083d2d46`).
+
+### IMPLEMENTADO (no ar)
+
+- **Módulo:**
+  - hub, Feed Planner, calendário (mês/semana/dia), publicações;
+  - aprovações, rascunhos, publicados, campanhas e biblioteca;
+  - editor com prévia.
+- **Testes:**
+  - 60/60 no Node (32 gerais + 28 do Criativos, contra um servidor que imita a API da Meta);
+  - 19/19 no Worker com D1.
+- **Agendador:** Cron Trigger `* * * * *` ativo. Execuções verificadas em produção: CPU de 1 a 9 ms por execução e nenhuma exceção.
+- **Permissões e isolamento:** RBAC `creatives.*`. Isolamento entre workspaces verificado em produção: IDs de outro workspace respondem 404 em todas as rotas do módulo.
+- **Trilhas:** aprovação com motivo obrigatório; auditoria, notificações, automações e busca global.
+- **Integração:** com tarefas e projetos.
+
+### PENDENTE DE CONFIGURAÇÃO EXTERNA
+
+Até isso ser feito, **a publicação no Instagram não está em produção**. O planejamento (campanhas, aprovações, calendário) funciona; a interface mostra "Instagram não conectado" e não simula nenhuma conexão.
+
+| Item | Situação em 06/10/2026 |
+|---|---|
+| App da Meta (tipo Business, produto *Instagram API with Instagram Login*) | não criado / não informado |
+| `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` | ausentes (o único segredo em produção é `TASKLY_ENCRYPTION_KEY`) |
+| URI de redirecionamento a cadastrar na Meta | `https://taskly.layla-figueiredo.workers.dev/api/social/instagram/callback` |
+| App Review / Advanced Access | necessário para contas fora da equipe do app |
+| Cloudflare R2 | não habilitado na conta (API: código 10042). Uploads respondem 503 `STORAGE_NOT_CONFIGURED`. Depois de habilitar: `npx wrangler r2 bucket create taskly-files`, descomentar `r2_buckets` no `wrangler.jsonc` e fazer push |
+
+Enquanto não houver uma conta conectada, não é possível criar publicações (toda publicação pertence a uma conta). Também não há criativos enquanto o R2 não existir.
+
+### Operação
+
+- **Restauração:** o ponto do Time Travel anterior à migration 0003 é o bookmark `0000008a-00000000-000050fc-4da268865364f63ae045d791f0c71778`, de 2026-10-06T14:53:45Z. Para restaurar: `npx wrangler d1 time-travel restore taskly --bookmark=<bookmark>`.
+- **Propagação do Cron:** mudanças no Cron levam alguns minutos para valer. A primeira execução por minuto foi observada cerca de 5 minutos após o deploy.
+- **Ordem do deploy:** migrations novas devem ser aplicadas (`npm run d1:migrate:remote`) **antes** do push. O comando de deploy do painel continua `npx wrangler deploy`.
